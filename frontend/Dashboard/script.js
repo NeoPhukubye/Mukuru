@@ -3,6 +3,10 @@
 // Main Dashboard JavaScript
 // ================================================================
 
+// ================================================================
+// API CONFIGURATION
+// ================================================================
+const API_BASE_URL = "http://127.0.0.1:8000"; // Local FastAPI server URL
 
 // ================================================================
 // 1. TRANSLATIONS
@@ -534,8 +538,8 @@ const translations = {
 
 let currentLanguage = "en";
 let userSymbol = "R";
-let userManaged = 3500;
-let userSentHome = 1200;
+let userManaged = 0; 
+let userSentHome = 0; 
 let userName = "Grace";
 
 
@@ -605,7 +609,7 @@ function loadSavedLanguage() {
 
 
 // ================================================================
-// 5. GOALS (Dynamic Array - Starts empty for new users)
+// 5. GOALS (Dynamic Array - Syncs with LocalStorage & Backend API)
 // ================================================================
 
 let goals = JSON.parse(localStorage.getItem("mukuruGoals")) || [];
@@ -687,8 +691,16 @@ function renderGoals() {
 }
 
 // Function to allow deleting a goal
-function deleteGoal(index) {
+async function deleteGoal(index) {
     if (confirm("Are you sure you want to delete this goal?")) {
+        const goalToDelete = goals[index];
+        if (goalToDelete.id) {
+            try {
+                await fetch(`${API_BASE_URL}/goals/${goalToDelete.id}`, { method: "DELETE" });
+            } catch (err) {
+                console.warn("Backend delete endpoint unreachable, deleting locally:", err);
+            }
+        }
         goals.splice(index, 1);
         renderGoals();
     }
@@ -699,7 +711,7 @@ function deleteGoal(index) {
 // 7. ADD MONEY TO A GOAL
 // ================================================================
 
-function addMoneyToGoal(index) {
+async function addMoneyToGoal(index) {
 
     const amount = prompt(
         "How much would you like to add?"
@@ -717,6 +729,19 @@ function addMoneyToGoal(index) {
     }
 
     goals[index].current += number;
+
+    // Send update to FastAPI backend if goal ID exists
+    if (goals[index].id) {
+        try {
+            await fetch(`${API_BASE_URL}/goals/${goals[index].id}/add-funds`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: number })
+            });
+        } catch (err) {
+            console.warn("Backend update unreachable, updated locally:", err);
+        }
+    }
 
     renderGoals();
 }
@@ -843,7 +868,7 @@ function setupGoalForm() {
     }
 
     if (saveButton) {
-        saveButton.addEventListener("click", function () {
+        saveButton.addEventListener("click", async function () {
 
             const title =
                 document.getElementById("new-goal-title").value.trim();
@@ -862,12 +887,33 @@ function setupGoalForm() {
                 return;
             }
 
-            goals.push({
+            const newGoalObj = {
                 titleKey: null,
                 customTitle: title,
                 current: 0,
                 target: target
-            });
+            };
+
+            // Post new goal to FastAPI backend router
+            try {
+                const response = await fetch(`${API_BASE_URL}/goals/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: title,
+                        target_amount: target,
+                        current_amount: 0
+                    })
+                });
+                if (response.ok) {
+                    const savedBackendGoal = await response.json();
+                    newGoalObj.id = savedBackendGoal.id;
+                }
+            } catch (err) {
+                console.warn("Backend server offline, saved goal locally:", err);
+            }
+
+            goals.push(newGoalObj);
 
             form.style.display = "none";
 
@@ -917,21 +963,21 @@ function setupAuthFlow() {
     }
 
     if (loginForm) {
-        loginForm.addEventListener("submit", function (e) {
+        loginForm.addEventListener("submit", async function (e) {
             e.preventDefault();
             const selectedCurrency = document.getElementById("login-currency")?.value || "ZAR";
             userSymbol = currencySymbols[selectedCurrency] || "R";
 
             authScreen.style.display = "none";
             dashboardScreen.style.display = "block";
-            renderOverview();
-            renderGoals();
-            renderExpenses();
+
+            // Fetch live overview & goals from FastAPI backend on sign-in
+            await fetchDashboardData();
         });
     }
 
     if (registerForm) {
-        registerForm.addEventListener("submit", function (e) {
+        registerForm.addEventListener("submit", async function (e) {
             e.preventDefault();
             const nameInput = document.getElementById("reg-name")?.value.trim();
             const selectedCurrency = document.getElementById("reg-currency")?.value || "ZAR";
@@ -943,9 +989,9 @@ function setupAuthFlow() {
 
             authScreen.style.display = "none";
             dashboardScreen.style.display = "block";
-            renderOverview();
-            renderGoals();
-            renderExpenses();
+
+            // Fetch initial dashboard state from backend
+            await fetchDashboardData();
         });
     }
 
@@ -1011,7 +1057,7 @@ function setupNavigation() {
             function () {
 
                 window.location.href =
-                    "../Reports and polish/index.html";
+                    "../Reports and polish/pages/onboarding.html";
 
             }
         );
@@ -1067,7 +1113,60 @@ function setupLanguageSelectors() {
 
 
 // ================================================================
-// 15. START THE DASHBOARD
+// 15. BACKEND API FETCH ENGINE
+// ================================================================
+
+async function fetchDashboardData() {
+    try {
+        // 1. Fetch budget overview from FastAPI
+        const overviewRes = await fetch(`${API_BASE_URL}/budget/overview`);
+        if (overviewRes.ok) {
+            const overviewData = await overviewRes.json();
+            userManaged = overviewData.total_managed || 0;
+            userSentHome = overviewData.sent_home || 0;
+            renderOverview();
+        }
+
+        // 2. Fetch savings goals from FastAPI
+        const goalsRes = await fetch(`${API_BASE_URL}/goals/`);
+        if (goalsRes.ok) {
+            const goalsData = await goalsRes.json();
+            if (Array.isArray(goalsData) && goalsData.length > 0) {
+                goals = goalsData.map(g => ({
+                    id: g.id,
+                    customTitle: g.title,
+                    current: g.current_amount || 0,
+                    target: g.target_amount || 0
+                }));
+            }
+            renderGoals();
+        }
+
+        // 3. Fetch expense breakdown from FastAPI
+        const expensesRes = await fetch(`${API_BASE_URL}/budget/expenses`);
+        if (expensesRes.ok) {
+            const expensesData = await expensesRes.json();
+            if (Array.isArray(expensesData) && expensesData.length > 0) {
+                expenses = expensesData.map(e => ({
+                    key: e.category ? e.category.toLowerCase() : "other",
+                    customTitle: e.category,
+                    amount: e.amount || 0,
+                    percentage: e.percentage || 0
+                }));
+            }
+            renderExpenses();
+        }
+    } catch (error) {
+        console.warn("Backend API server not reachable. Running on local state:", error);
+        renderOverview();
+        renderGoals();
+        renderExpenses();
+    }
+}
+
+
+// ================================================================
+// 16. START THE DASHBOARD
 // ================================================================
 
 function startDashboard() {
@@ -1088,7 +1187,7 @@ function startDashboard() {
 
 
 // ================================================================
-// 16. START EVERYTHING
+// 17. START EVERYTHING
 // ================================================================
 
 document.addEventListener(
@@ -1100,6 +1199,8 @@ document.addEventListener(
         startDashboard();
 
         loadSavedLanguage();
+
+        fetchDashboardData();
 
     }
 );
