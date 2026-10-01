@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mukuru Money Coach</title>
+
+    <link rel="stylesheet" href="css/onboarding.css">
+
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .entry-actions {
+            text-align: center;
+        }
+
+        .entry-actions button {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+            padding: 14px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!--
+        Entry point for the Reports and polish app.
+
+        The Dashboard's "View My Reports" button links here, so this file used
+        to be empty and the navigation dead-ended. It now routes onward to the
+        onboarding flow or straight to the account.
+    -->
+
+    <main class="onboarding-container">
+
+        <section class="welcome-section entry-actions">
+
+            <h1>Mukuru Money Coach</h1>
+
+            <p>Your money, your goals, your progress.</p>
+
+            <button id="startButton" type="button">
+                Get Started
+            </button>
+
+            <button id="skipButton" type="button">
+                Go to My Account
+            </button>
+
+        </section>
+
+    </main>
+
+    <script>
+        document.getElementById("startButton").addEventListener("click", function () {
+            window.location.href = "pages/onboarding.html";
+        });
+
+        document.getElementById("skipButton").addEventListener("click", function () {
+            window.location.href = "pages/account.html";
+        });
+    </script>
+
+</body>
+
+</html>
