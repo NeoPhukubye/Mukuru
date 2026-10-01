@@ -1,131 +1,330 @@
+/* ================================================================
+   MUKURU MONEY COACH - MAIN STYLESHEET
+   ================================================================ */
+
+/* RESET & BASE STYLES */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 body {
   background-color: #121212;
   color: #ffffff;
-  padding: 16px;
   min-height: 100vh;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
 }
 
+/* APP CONTAINERS */
+#auth-screen, #dashboard-screen {
+  width: 100%;
+  max-width: 420px; /* Mobile app viewport width */
+  margin: 0 auto;
+}
+
+.card, .coach-card, .tip-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* AUTHENTICATION SCREEN */
+.auth-card {
+  margin-top: 20px;
+}
+
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.brand-title {
+  color: #FF6B00; /* Mukuru Brand Orange */
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+#app-tagline {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+/* SELECT DROPDOWNS & INPUTS */
+select, input[type="text"], input[type="number"], input[type="password"], input[type="tel"] {
+  width: 100%;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+select:focus, input:focus {
+  border-color: #FF6B00;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: #bbb;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.phone-row {
+  display: flex;
+  gap: 8px;
+}
+
+.phone-row select {
+  width: 40%;
+}
+
+.phone-row input {
+  width: 60%;
+}
+
+/* AUTH TABS */
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  background-color: #2a2a2a;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  padding: 10px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-tab.active-tab {
+  background-color: #FF6B00 !important;
+  color: #ffffff !important;
+}
+
+/* DASHBOARD HEADER */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-bottom: 12px;
+  margin-bottom: 16px;
   border-bottom: 1px solid #2a2a2a;
 }
 
-.brand-title {
-  color: #FF6B00;
-  font-size: 1.4rem;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions select {
+  padding: 6px;
+  font-size: 0.8rem;
+}
+
+.logout-button {
+  background: #333;
+  color: #ff5252;
+  border: 1px solid #444;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
   font-weight: bold;
 }
 
-.card {
-  background: #1e1e1e;
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 16px;
-}
-
-.card-title {
-  font-size: 0.8rem;
+/* DASHBOARD CARDS & NUMBERS */
+.card-title, .section-heading h2 {
+  font-size: 0.85rem;
   color: #aaa;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
 }
 
 .amount {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin-top: 4px;
-}
-
-.managed-label {
-  font-size: 0.9rem;
-  color: #aaa;
-  font-weight: normal;
+  color: #ffffff;
+  margin: 4px 0;
 }
 
 .sub-text {
-  color: #4CAF50;
-  margin-top: 6px;
+  color: #4CAF50; /* Positive status green */
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
-.card-header {
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: bold;
-  margin-bottom: 12px;
+.small-text {
+  color: #888;
+  font-size: 0.8rem;
 }
 
-.goal-item {
-  margin-bottom: 16px;
-}
-
-.flex-between {
+/* COACH HIGHLIGHT CARD */
+.coach-card {
+  background: linear-gradient(135deg, #2a1b10 0%, #1e1e1e 100%);
+  border: 1px solid #FF6B00;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
-.list-row {
-  padding: 6px 0;
+.coach-card h2 {
+  color: #FF6B00;
+  font-size: 1rem;
+  margin-bottom: 4px;
 }
 
-.orange-text { color: #FF6B00; font-weight: bold; }
-.blue-text { color: #2196F3; font-weight: bold; }
-
-.orange-bg { background-color: #FF6B00; }
-.blue-bg { background-color: #2196F3; }
-
-.progress-bg {
-  background: #333;
-  height: 10px;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-top: 6px;
+.coach-card p {
+  font-size: 0.8rem;
+  color: #ccc;
 }
 
-.progress-fill {
-  height: 100%;
-  transition: width 0.3s ease;
+/* BUTTONS */
+.btn-primary {
+  background-color: #FF6B00;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #e56000;
+}
+
+.btn-secondary {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
 }
 
 .btn-action {
-  margin-top: 8px;
-  background: #2a2a2a;
-  color: #fff;
+  background-color: #2a2a2a;
+  color: #ffffff;
   border: 1px solid #444;
   border-radius: 6px;
   padding: 6px 12px;
   font-size: 0.8rem;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-action:hover {
-  background: #333;
+  background-color: #3d3d3d;
 }
 
+/* SECTION HEADINGS & FORMS */
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#add-goal-form {
+  background-color: #252525;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #333;
+}
+
+#add-goal-form label {
+  font-size: 0.75rem;
+  color: #aaa;
+  display: block;
+  margin: 8px 0 4px 0;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* DYNAMIC GOAL & EXPENSE ITEMS */
+.goal-item, .expense-item {
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.goal-item:last-child, .expense-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* TEAM MATE NAVIGATION BUTTONS */
 .nav-buttons {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .btn-nav {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.btn-primary { background: #FF6B00; color: #fff; }
-.btn-secondary { background: #2a2a2a; color: #fff; border: 1px solid #444; }
+/* HELP & LINK BUTTONS */
+.help-text {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 14px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #FF6B00;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.8rem;
+}

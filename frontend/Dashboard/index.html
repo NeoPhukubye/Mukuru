@@ -3,71 +3,683 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mukuru Dashboard</title>
+
+  <title>Mukuru Money Coach</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <div class="app-header">
-    <span class="brand-title">mukuru</span>
-    <span> Hello, Grace</span>
-  </div>
+  <!-- ============================================================= -->
+  <!-- AUTHENTICATION SCREEN                                         -->
+  <!-- ============================================================= -->
 
-  <div class="card">
-    <div class="card-title">September Overview</div>
-    <div class="amount">R3,500 <span class="managed-label">Managed</span></div>
-    <p class="sub-text"> R1,200 sent home to Zimbabwe this month</p>
-  </div>
+  <div id="auth-screen" class="card auth-card">
 
-  <div class="card">
-    <div class="card-header"> Savings Goals</div>
-    
-    <!-- Goal 1 -->
-    <div class="goal-item">
-      <div class="flex-between">
-        <span>Sister's School Fees</span>
-        <span id="school-text" class="orange-text">R400 / R1,000</span>
+    <!-- BRAND + LANGUAGE -->
+    <div class="auth-header">
+
+      <div>
+        <h2 class="brand-title">mukuru</h2>
+
+        <p id="app-tagline" data-i18n="tagline">
+          Simple money guidance for you
+        </p>
       </div>
-      <div class="progress-bg">
-        <div id="school-bar" class="progress-fill orange-bg" style="width: 40%;"></div>
-      </div>
-      <button id="add-school-btn" class="btn-action">+ Add R50 to goal</button>
+
+      <!-- LANGUAGE SELECTOR -->
+      <select
+        id="app-language-select"
+        aria-label="Select language">
+
+        <option value="en">🇬🇧 English</option>
+        <option value="zu">🇿🇦 isiZulu</option>
+        <option value="st">🇱🇸 Sesotho</option>
+        <option value="sn">🇿🇼 chiShona</option>
+        <option value="ny">🇲🇼 Chichewa</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="pt">🇵🇹 Português</option>
+
+      </select>
+
     </div>
 
-    <div class="goal-item">
-      <div class="flex-between">
-        <span>Fridge Back Home</span>
-        <span id="fridge-text" class="blue-text">R300 / R1,500</span>
-      </div>
-      <div class="progress-bg">
-        <div id="fridge-bar" class="progress-fill blue-bg" style="width: 20%;"></div>
-      </div>
-      <button id="add-fridge-btn" class="btn-action">+ Add R50 to goal</button>
+
+    <!-- AUTH TABS -->
+    <div class="auth-tabs">
+
+      <button
+        id="tab-login"
+        class="auth-tab active-tab"
+        type="button">
+
+        <span data-i18n="signIn">
+          Sign In / Log In
+        </span>
+
+      </button>
+
+      <button
+        id="tab-register"
+        class="auth-tab"
+        type="button">
+
+        <span data-i18n="createAccount">
+          Sign Up / New Account
+        </span>
+
+      </button>
+
     </div>
+
+
+    <!-- =========================================================== -->
+    <!-- LOGIN FORM                                                  -->
+    <!-- =========================================================== -->
+
+    <form id="login-form">
+
+      <!-- PHONE -->
+      <div class="form-group">
+
+        <label
+          id="lbl-login-phone"
+          for="login-id"
+          data-i18n="phoneNumber">
+
+          Phone Number or Mukuru ID
+
+        </label>
+
+        <div class="phone-row">
+
+          <select id="login-country-code">
+
+            <option value="+27">🇿🇦 +27 (South Africa)</option>
+            <option value="+263">🇿🇼 +263 (Zimbabwe)</option>
+            <option value="+265">🇲🇼 +265 (Malawi)</option>
+            <option value="+260">🇿🇲 +260 (Zambia)</option>
+            <option value="+266">🇱🇸 +266 (Lesotho)</option>
+            <option value="+268">🇸🇿 +268 (Eswatini)</option>
+            <option value="+258">🇲🇿 +258 (Mozambique)</option>
+            <option value="+254">🇰🇪 +254 (Kenya)</option>
+            <option value="+256">🇺🇬 +256 (Uganda)</option>
+            <option value="+255">🇹🇿 +255 (Tanzania)</option>
+            <option value="+234">🇳🇬 +234 (Nigeria)</option>
+            <option value="+233">🇬🇭 +233 (Ghana)</option>
+            <option value="+44">🇬🇧 +44 (United Kingdom)</option>
+            <option value="+1">🇺🇸 +1 (USA / Canada)</option>
+
+          </select>
+
+          <input
+            type="tel"
+            id="login-id"
+            placeholder="82 123 4567"
+            required>
+
+        </div>
+
+      </div>
+
+
+      <!-- COUNTRY -->
+      <div class="form-group">
+
+        <label
+          id="lbl-login-country"
+          for="login-country"
+          data-i18n="currentCountry">
+
+          Current Location / Country
+
+        </label>
+
+        <select id="login-country">
+
+          <option value="South Africa">South Africa 🇿🇦</option>
+          <option value="Zimbabwe">Zimbabwe 🇿🇼</option>
+          <option value="Malawi">Malawi 🇲🇼</option>
+          <option value="Zambia">Zambia 🇿🇲</option>
+          <option value="Lesotho">Lesotho 🇱🇸</option>
+          <option value="Eswatini">Eswatini 🇸🇿</option>
+          <option value="Mozambique">Mozambique 🇲🇿</option>
+          <option value="Kenya">Kenya 🇰🇪</option>
+          <option value="Uganda">Uganda 🇺🇬</option>
+          <option value="Tanzania">Tanzania 🇹🇿</option>
+          <option value="Nigeria">Nigeria 🇳🇬</option>
+          <option value="Ghana">Ghana 🇬🇭</option>
+
+        </select>
+
+      </div>
+
+
+      <!-- CURRENCY -->
+      <div class="form-group">
+
+        <label
+          id="lbl-login-currency"
+          for="login-currency"
+          data-i18n="currency">
+
+          Display Currency
+
+        </label>
+
+        <select id="login-currency">
+
+          <option value="ZAR">ZAR (R - South African Rand)</option>
+          <option value="USD">USD ($ - US Dollar)</option>
+          <option value="MWK">MWK (MK - Malawian Kwacha)</option>
+          <option value="ZMW">ZMW (K - Zambian Kwacha)</option>
+          <option value="KES">KES (KSh - Kenyan Shilling)</option>
+          <option value="GBP">GBP (£ - British Pound)</option>
+          <option value="EUR">EUR (€ - Euro)</option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PIN -->
+      <div class="form-group">
+
+        <label
+          id="lbl-login-pin"
+          for="login-pin"
+          data-i18n="pin">
+
+          PIN / Password
+
+        </label>
+
+        <input
+          type="password"
+          id="login-pin"
+          placeholder="••••"
+          maxlength="4"
+          required>
+
+      </div>
+
+
+      <!-- LOGIN BUTTON -->
+      <button
+        type="submit"
+        id="btn-login-submit"
+        class="btn-nav btn-primary">
+
+        <span data-i18n="signIn">
+          Sign In / Log In
+        </span>
+
+      </button>
+
+
+      <!-- HELP -->
+      <p class="help-text">
+        <span data-i18n="needHelp">
+          Need help?
+        </span>
+
+        <button
+          type="button"
+          id="forgot-pin"
+          class="link-button"
+          data-i18n="forgotPin">
+
+          Forgot your PIN?
+
+        </button>
+      </p>
+
+    </form>
+
+
+    <!-- =========================================================== -->
+    <!-- REGISTER FORM                                                -->
+    <!-- =========================================================== -->
+
+    <form
+      id="register-form"
+      style="display: none;">
+
+      <!-- NAME -->
+      <div class="form-group">
+
+        <label
+          for="reg-name"
+          data-i18n="fullName">
+
+          Full Name
+
+        </label>
+
+        <input
+          type="text"
+          id="reg-name"
+          placeholder="Enter your full name"
+          required>
+
+      </div>
+
+
+      <!-- COUNTRY -->
+      <div class="form-group">
+
+        <label
+          for="reg-country"
+          data-i18n="countryOfResidence">
+
+          Country of Residence
+
+        </label>
+
+        <select id="reg-country">
+
+          <option value="South Africa">South Africa 🇿🇦</option>
+          <option value="Zimbabwe">Zimbabwe 🇿🇼</option>
+          <option value="Malawi">Malawi 🇲🇼</option>
+          <option value="Zambia">Zambia 🇿🇲</option>
+          <option value="Lesotho">Lesotho 🇱🇸</option>
+          <option value="Eswatini">Eswatini 🇸🇿</option>
+          <option value="Mozambique">Mozambique 🇲🇿</option>
+          <option value="Kenya">Kenya 🇰🇪</option>
+          <option value="Uganda">Uganda 🇺🇬</option>
+          <option value="Tanzania">Tanzania 🇹🇿</option>
+          <option value="Nigeria">Nigeria 🇳🇬</option>
+          <option value="Ghana">Ghana 🇬🇭</option>
+
+        </select>
+
+      </div>
+
+
+      <!-- CURRENCY -->
+      <div class="form-group">
+
+        <label
+          for="reg-currency"
+          data-i18n="preferredCurrency">
+
+          Preferred Currency
+
+        </label>
+
+        <select id="reg-currency">
+
+          <option value="ZAR">ZAR (R - South African Rand)</option>
+          <option value="USD">USD ($ - US Dollar)</option>
+          <option value="MWK">MWK (MK - Malawian Kwacha)</option>
+          <option value="ZMW">ZMW (K - Zambian Kwacha)</option>
+          <option value="KES">KES (KSh - Kenyan Shilling)</option>
+          <option value="GBP">GBP (£ - British Pound)</option>
+          <option value="EUR">EUR (€ - Euro)</option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PHONE -->
+      <div class="form-group">
+
+        <label
+          for="reg-phone"
+          data-i18n="phoneNumberOnly">
+
+          Phone Number
+
+        </label>
+
+        <div class="phone-row">
+
+          <select id="reg-country-code">
+
+            <option value="+27">🇿🇦 +27</option>
+            <option value="+263">🇿🇼 +263</option>
+            <option value="+265">🇲🇼 +265</option>
+            <option value="+260">🇿🇲 +260</option>
+            <option value="+266">🇱🇸 +266</option>
+            <option value="+258">🇲🇿 +258</option>
+            <option value="+254">🇰🇪 +254</option>
+            <option value="+256">🇺🇬 +256</option>
+            <option value="+234">🇳🇬 +234</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+1">🇺🇸 +1</option>
+
+          </select>
+
+          <input
+            type="tel"
+            id="reg-phone"
+            placeholder="82 123 4567"
+            required>
+
+        </div>
+
+      </div>
+
+
+      <!-- PIN -->
+      <div class="form-group">
+
+        <label
+          for="reg-pin"
+          data-i18n="createPin">
+
+          Create Secret PIN
+
+        </label>
+
+        <input
+          type="password"
+          id="reg-pin"
+          placeholder="••••"
+          maxlength="4"
+          required>
+
+      </div>
+
+
+      <button
+        type="submit"
+        id="btn-reg-submit"
+        class="btn-nav btn-primary">
+
+        <span data-i18n="createAccount">
+          Sign Up / Create Account
+        </span>
+
+      </button>
+
+    </form>
+
   </div>
 
-  <div class="card">
-    <div class="card-header"> Expense Breakdown</div>
-    <div class="flex-between list-row">
-      <span> Remittances Home</span>
-      <span>R1,200 (34%)</span>
-    </div>
-    <div class="flex-between list-row">
-      <span> Groceries & Rent</span>
-      <span>R1,800 (51%)</span>
-    </div>
-    <div class="flex-between list-row">
-      <span>Airtime & Data</span>
-      <span>R200 (6%)</span>
-    </div>
+
+  <!-- ============================================================= -->
+  <!-- MAIN DASHBOARD                                                -->
+  <!-- ============================================================= -->
+
+  <div id="dashboard-screen" style="display: none;">
+
+    <header class="app-header">
+
+      <div>
+        <span class="brand-title">mukuru</span>
+
+        <p
+          id="user-greeting"
+          data-i18n="welcome">
+          👋 Welcome
+        </p>
+      </div>
+
+      <div class="header-actions">
+
+        <select
+          id="dashboard-language-select"
+          aria-label="Select language">
+
+          <option value="en">🇬🇧 English</option>
+          <option value="zu">🇿🇦 isiZulu</option>
+          <option value="st">🇱🇸 Sesotho</option>
+          <option value="sn">🇿🇼 chiShona</option>
+          <option value="ny">🇲🇼 Chichewa</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="pt">🇵🇹 Português</option>
+
+        </select>
+
+        <button
+          id="logout-btn"
+          class="logout-button"
+          type="button"
+          data-i18n="signOut">
+
+          Sign Out
+
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <main class="dashboard-container">
+
+      <!-- ========================================================= -->
+      <!-- MONEY SNAPSHOT                                             -->
+      <!-- ========================================================= -->
+
+      <section class="card">
+
+        <h2
+          class="card-title"
+          data-i18n="monthlyOverview">
+
+          Monthly Money Overview
+
+        </h2>
+
+        <p
+          class="small-text"
+          data-i18n="moneyManaged">
+          Money you managed this month
+        </p>
+
+        <div class="amount">
+
+          <span id="total-managed">
+            R0
+          </span>
+
+        </div>
+
+        <p
+          id="remittance-summary"
+          class="sub-text">
+
+          💸 R0 sent home this month
+
+        </p>
+
+      </section>
+
+
+      <!-- ========================================================= -->
+      <!-- MONEY COACH                                                -->
+      <!-- ========================================================= -->
+
+      <section class="coach-card">
+
+        <div>
+
+          <h2 data-i18n="moneyCoach">
+            Money Coach
+          </h2>
+
+          <p data-i18n="coachMessage">
+            Need help with your money? Ask for simple guidance.
+          </p>
+
+        </div>
+
+        <button
+          id="open-coach-btn"
+          class="btn-primary"
+          type="button"
+          data-i18n="askCoach">
+
+          Ask Money Coach
+
+        </button>
+
+      </section>
+
+
+      <!-- ========================================================= -->
+      <!-- SAVINGS GOALS                                              -->
+      <!-- ========================================================= -->
+
+      <section class="card">
+
+        <div class="section-heading">
+
+          <h2 data-i18n="savingsGoals">
+            My Savings Goals
+          </h2>
+
+          <button
+            id="toggle-goal-form-btn"
+            class="btn-action"
+            type="button"
+            data-i18n="newGoal">
+
+            + New Goal
+
+          </button>
+
+        </div>
+
+
+        <!-- ADD GOAL FORM -->
+        <div
+          id="add-goal-form"
+          style="display: none;">
+
+          <label
+            for="new-goal-title"
+            data-i18n="goalName">
+            Goal Name
+          </label>
+
+          <input
+            type="text"
+            id="new-goal-title"
+            placeholder="Example: School Fees">
+
+          <label
+            for="new-goal-target"
+            data-i18n="targetAmount">
+            Target Amount
+          </label>
+
+          <input
+            type="number"
+            id="new-goal-target"
+            placeholder="Example: 5000">
+
+          <div class="button-row">
+
+            <button
+              id="save-goal-btn"
+              class="btn-primary"
+              type="button"
+              data-i18n="saveGoal">
+
+              Save Goal
+
+            </button>
+
+            <button
+              id="cancel-goal-btn"
+              class="btn-secondary"
+              type="button"
+              data-i18n="cancel">
+
+              Cancel
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- GOALS WILL BE ADDED BY JAVASCRIPT -->
+        <div id="goals-container"></div>
+
+      </section>
+
+
+      <!-- ========================================================= -->
+      <!-- EXPENSES                                                   -->
+      <!-- ========================================================= -->
+
+      <section class="card">
+
+        <h2 data-i18n="expenseBreakdown">
+          Where Your Money Goes
+        </h2>
+
+        <div id="expenses-container"></div>
+
+      </section>
+
+
+      <!-- ========================================================= -->
+      <!-- SIMPLE MONEY TIP                                           -->
+      <!-- ========================================================= -->
+
+      <section class="tip-card">
+
+        <h2 data-i18n="moneyTip">
+          💡 Money Tip
+        </h2>
+
+        <p id="money-tip">
+          Small savings can help you reach a big goal.
+        </p>
+
+      </section>
+
+
+      <!-- ========================================================= -->
+      <!-- TEAM NAVIGATION                                            -->
+      <!-- ========================================================= -->
+
+      <section class="nav-buttons">
+
+        <button
+          id="open-ai-chat"
+          class="btn-nav btn-primary"
+          type="button">
+
+          💬
+          <span data-i18n="askCoach">
+            Ask Money Coach
+          </span>
+
+        </button>
+
+        <button
+          id="open-reports"
+          class="btn-nav btn-secondary"
+          type="button">
+
+          📄
+          <span data-i18n="viewReports">
+            View My Reports
+          </span>
+
+        </button>
+
+      </section>
+
+    </main>
+
   </div>
 
-  <!-- Teammate Integration Navigation -->
-  <div class="nav-buttons">
-    <button class="btn-nav btn-primary" onclick="window.location.href='../ai-chat/index.html'">💬 AI Coach</button>
-    <button class="btn-nav btn-secondary" onclick="alert('Navigates to Credit Report (Frontend Lead 3)')">📄 Credit Score</button>
-  </div>
+
+  <!-- ============================================================= -->
+  <!-- JAVASCRIPT                                                    -->
+  <!-- ============================================================= -->
 
   <script src="script.js"></script>
+
 </body>
 </html>
