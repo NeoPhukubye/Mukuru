@@ -30,10 +30,10 @@ jobs:
 
       - name: Smoke-test server startup
         run: |
-          (uvicorn app.main:app --host 12.0.0.1 --port 8765 > /tmp/uv.log 2>&1 &) 
+          (uvicorn app.main:app --host 127.0.0.1 --port 8765 > /tmp/uv.log 2>&1 &) 
           sleep 4
-          curl -fsS http://12.0.0.1:8765/health
-          curl -fsS "http://12.0.0.1:8765/analyze-budget?user_id=grace" | head -c 200
+          curl -fsS http://127.0.0.1:8765/health
+          curl -fsS "http://127.0.0.1:8765/analyze-budget?user_id=grace" | head -c 200
           echo
 
   deploy:
