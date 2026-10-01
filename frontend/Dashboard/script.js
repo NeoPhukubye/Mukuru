@@ -1010,62 +1010,29 @@ function setupAuthFlow() {
 
 function setupNavigation() {
 
-    const coachButton =
-        document.getElementById("open-ai-chat");
-
-    const coachButtonTop =
-        document.getElementById("open-coach-btn");
-
-    const reportsButton =
-        document.getElementById("open-reports");
-
+    const coachButton = document.getElementById("open-ai-chat");
+    const coachButtonTop = document.getElementById("open-coach-btn");
+    const reportsButton = document.getElementById("open-reports");
 
     if (coachButton) {
-
-        coachButton.addEventListener(
-            "click",
-            function () {
-
-                window.location.href =
-                    "../ai-chat/index.html";
-
-            }
-        );
-
+        coachButton.addEventListener("click", function () {
+            window.location.href = "../ai-chat/index.html";
+        });
     }
-
 
     if (coachButtonTop) {
-
-        coachButtonTop.addEventListener(
-            "click",
-            function () {
-
-                window.location.href =
-                    "../ai-chat/index.html";
-
-            }
-        );
-
+        coachButtonTop.addEventListener("click", function () {
+            window.location.href = "../ai-chat/index.html";
+        });
     }
-
 
     if (reportsButton) {
-
-        reportsButton.addEventListener(
-            "click",
-            function () {
-
-                window.location.href =
-                    "../Reports and polish/pages/onboarding.html";
-
-            }
-        );
-
+        reportsButton.addEventListener("click", function () {
+            // Standard relative path to Lead 3's onboarding page:
+            window.location.href = "../Reports and polish/pages/onboarding.html";
+        });
     }
-
 }
-
 
 // ================================================================
 // 14. LANGUAGE SELECTORS
