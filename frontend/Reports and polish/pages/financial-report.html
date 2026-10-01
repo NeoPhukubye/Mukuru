@@ -18,7 +18,7 @@
 
             <h1>Financial Health Report</h1>
 
-            <p>Your monthly money overview</p>
+            <p id="reportSubtitle">Your monthly money overview</p>
 
         </header>
 
@@ -29,7 +29,7 @@
 
             <div class="report-row">
                 <span>Monthly income</span>
-                <strong>R8,500</strong>
+                <strong id="monthlyIncome">—</strong>
             </div>
 
         </section>
@@ -41,7 +41,7 @@
 
             <div class="report-row">
                 <span>Monthly remittances</span>
-                <strong>R2,000</strong>
+                <strong id="monthlyRemittances">—</strong>
             </div>
 
             <p class="report-note">
@@ -57,7 +57,7 @@
 
             <div class="report-row">
                 <span>Monthly personal expenses</span>
-                <strong>R3,200</strong>
+                <strong id="monthlyExpenses">—</strong>
             </div>
 
         </section>
@@ -69,7 +69,7 @@
 
             <div class="report-row">
                 <span>Money saved</span>
-                <strong>R3,300</strong>
+                <strong id="moneySaved">—</strong>
             </div>
 
         </section>
@@ -81,19 +81,19 @@
 
             <p>Your current credit score</p>
 
-            <div class="credit-score">
-                682
+            <div class="credit-score" id="creditScore">
+                —
             </div>
 
-            <p class="score-change">
-                +24 points this month
+            <p class="score-change" id="scoreChange">
+                Loading your score…
             </p>
 
             <div class="credit-progress">
 
                 <div class="credit-progress-bar">
 
-                    <div class="credit-progress-fill"></div>
+                    <div class="credit-progress-fill" id="creditProgressFill"></div>
 
                 </div>
 
@@ -101,9 +101,9 @@
 
             <div class="credit-score-labels">
 
-                <span>658 last month</span>
+                <span id="creditPrevious">— last month</span>
 
-                <span>682 this month</span>
+                <span id="creditCurrent">— this month</span>
 
             </div>
 
@@ -114,15 +114,15 @@
 
             <h2>Savings Goal</h2>
 
-            <p>School fees</p>
+            <p id="goalName">—</p>
 
             <div class="progress-bar">
 
-                <div class="progress"></div>
+                <div class="progress" id="goalProgress"></div>
 
             </div>
 
-            <p>R4,000 saved of R5,000</p>
+            <p id="goalAmount">—</p>
 
         </section>
 
@@ -135,40 +135,7 @@
                 Recent money sent home
             </p>
 
-            <div class="remittance-row">
-
-                <div>
-                    <strong>25 September</strong>
-                    <p>Family support</p>
-                </div>
-
-                <strong>R1,000</strong>
-
-            </div>
-
-
-            <div class="remittance-row">
-
-                <div>
-                    <strong>15 September</strong>
-                    <p>Family support</p>
-                </div>
-
-                <strong>R500</strong>
-
-            </div>
-
-
-            <div class="remittance-row">
-
-                <div>
-                    <strong>05 September</strong>
-                    <p>Family support</p>
-                </div>
-
-                <strong>R500</strong>
-
-            </div>
+            <div id="remittanceList"></div>
 
         </section>
 
@@ -176,16 +143,18 @@
         <section class="report-actions">
 
             <button id="downloadButton">
-                Download Financial Report
+                Download Financial Report (PDF)
             </button>
+
+            <p class="report-note" id="downloadNote"></p>
 
         </section>
 
 
     </main>
 
-
-    <script src="../js/report.js"></script>
+    <script src="api-config.js"></script>
+    <script src="report.js"></script>
 
 </body>
 
