@@ -6,8 +6,8 @@ from datetime import date, timedelta
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import Session, select
 
-from ..db import add_goal, get_goal, list_goals
-from ..models import ErrorResponse, Goal, GoalCreate, GoalProgress
+from ..db import add_goal, add_goal_funds, delete_goal, get_goal, list_goals
+from ..models import ErrorResponse, Goal, GoalCreate, GoalFundsUpdate, GoalProgress
 
 router = APIRouter(prefix="/goals", tags=["goals"])
 
@@ -51,6 +51,23 @@ def get_goals(user_id: str = Query(..., min_length=1, max_length=64)) -> list[Go
 @router.get("/{goal_id}/progress", response_model=GoalProgress, responses={404: {"model": ErrorResponse}})
 def goal_progress(goal_id: int, user_id: str = Query(..., min_length=1, max_length=64)) -> GoalProgress:
     goal = get_goal(goal_id, user_id)
+    if not goal:
+        raise HTTPException(status_code=404, detail={"error": "not_found", "detail": "Goal not found."})
+    return _progress(goal)
+
+
+@router.delete("/{goal_id}", responses={404: {"model": ErrorResponse}})
+def remove_goal(goal_id: int, user_id: str = Query(..., min_length=1, max_length=64)) -> dict:
+    """Delete a goal. Scoped to the owner, so one user cannot delete another's."""
+    if not delete_goal(goal_id, user_id):
+        raise HTTPException(status_code=404, detail={"error": "not_found", "detail": "Goal not found."})
+    return {"deleted": goal_id}
+
+
+@router.patch("/{goal_id}/add-funds", response_model=GoalProgress, responses={404: {"model": ErrorResponse}})
+def add_funds(goal_id: int, body: GoalFundsUpdate) -> GoalProgress:
+    """Add money to a goal and return its updated progress."""
+    goal = add_goal_funds(goal_id, body.user_id, body.amount)
     if not goal:
         raise HTTPException(status_code=404, detail={"error": "not_found", "detail": "Goal not found."})
     return _progress(goal)
