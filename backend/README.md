@@ -46,8 +46,9 @@ Demo user: `grace` (password not required — just pass `user_id=grace`).
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `DATABASE_URL` | `sqlite:///./moneycoach.db` | Database connection |
-| `LLM_API_KEY` | _(empty)_ | Enable LLM-backed coach replies |
-| `LLM_MODEL` | `gpt-4o-mini` | LLM model name |
+| `GEMINI_API_KEY` | _(empty)_ | Enable Gemini-backed coach replies |
+| `GEMINI_MODEL` | `gemini-2.0-flash` | Gemini model name |
+| `GEMINI_TIMEOUT` | `10` | Gemini request timeout in seconds |
 | `HOST` | `0.0.0.0` | Bind host |
 | `PORT` | `8000` | Bind port |
 
