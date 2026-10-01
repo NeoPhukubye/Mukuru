@@ -3,32 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Money Coach AI</title>
+
+    <title>Mukuru Money Coach</title>
+
     <link rel="stylesheet" href="style.css">
-    
 </head>
+
 <body>
-    <div class="chat-container">
-        <header class="chat-header">
-            <h1>Money Coach</h1>
-            <p>Your personal financial coach</p>
-        </header>
 
-        <main class="chat-messages">
-            <div class="message coach-message">
-                Hi! 👋 I'm your Money Coach. Before we get started, what's your name?
+<div class="chat-container">
+
+    <!-- CHAT HEADER -->
+    <header class="chat-header">
+
+        <div class="header-brand">
+            <span class="brand-title">mukuru</span>
+
+            <div class="coach-title">
+                <h1>Money Coach</h1>
+                <p>Simple money guidance for you</p>
             </div>
+        </div>
+
+        <div class="coach-status">
+            <span class="status-dot"></span>
+            <span>Online</span>
+        </div>
+
+    </header>
+
+
+    <!-- CHAT MESSAGES -->
+    <main class="chat-messages">
+
+        <!-- Initial coach message -->
+        <div class="message coach-message">
+            <div class="message-label">Money Coach</div>
+
             
+            <div class="message-content">
+                Hi! I'm your Money Coach. 👋 What's your name?
+            </div>
 
 
-        </main>
-        <form class="chat-input">
-            <input type="text" id="message-input" placeholder="Ask your Money Coach...">
-            <button type="submit">Send</button>
-    
-        </form>
+        </div>
 
-    <script src="script.js"></script>
-    </div>
+    </main>
+
+
+    <!-- CHAT INPUT -->
+    <form class="chat-input">
+
+        <input
+            type="text"
+            id="message-input"
+            placeholder="Type a message..."
+            autocomplete="off"
+        >
+
+        <button type="submit" aria-label="Send message">
+            Send
+        </button>
+
+    </form>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
+

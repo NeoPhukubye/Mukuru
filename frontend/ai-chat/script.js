@@ -1,10 +1,16 @@
 const userId = "grace";
+
 let userName = "";
+let waitingForName = true;
 
 const chatForm = document.querySelector(".chat-input");
 const messageInput = document.querySelector("#message-input");
 const chatMessages = document.querySelector(".chat-messages");
 
+
+/* ================================================================
+   SEND MESSAGE
+   ================================================================ */
 
 chatForm.addEventListener("submit", function(event) {
     event.preventDefault();
@@ -15,20 +21,22 @@ chatForm.addEventListener("submit", function(event) {
         return;
     }
 
-    // Get the user's name on their first message
-    if (userName === "") {
+
+    /* ============================================================
+       GET USER'S NAME
+       ============================================================ */
+
+    if (waitingForName) {
+
         userName = message;
 
-        const userMessage = document.createElement("div");
-        userMessage.textContent = message;
-        userMessage.classList.add("message", "user-message");
-        chatMessages.appendChild(userMessage);
+        waitingForName = false;
 
-        const coachMessage = document.createElement("div");
-        coachMessage.textContent =
-            `Nice to meet you, ${userName}! 👋 I'm here to help you manage your money and reach your goals. You can ask me anything, or choose one of the options below to get started.`;
-        coachMessage.classList.add("message", "coach-message");
-        chatMessages.appendChild(coachMessage);
+        addUserMessage(userName);
+
+        addCoachMessage(
+            `Nice to meet you, ${userName}! 👋 How can I help you with your money today?`
+        );
 
         createSuggestionButtons();
 
@@ -38,19 +46,19 @@ chatForm.addEventListener("submit", function(event) {
     }
 
 
-    // Display the user's message
-    const userMessage = document.createElement("div");
+    /* ============================================================
+       NORMAL MONEY COACH MESSAGE
+       ============================================================ */
 
-    userMessage.textContent = message;
-
-    userMessage.classList.add("message", "user-message");
-
-    chatMessages.appendChild(userMessage);
+    addUserMessage(message);
 
     messageInput.value = "";
 
 
-    // Send the message to the backend
+    /* ============================================================
+       SEND MESSAGE TO BACKEND
+       ============================================================ */
+
     fetch("https://mukuru-jb1l.onrender.com/coach/chat", {
         method: "POST",
 
@@ -64,40 +72,105 @@ chatForm.addEventListener("submit", function(event) {
         })
     })
 
-    .then(response => response.json())
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("API request failed");
+        }
+
+        return response.json();
+    })
 
     .then(data => {
-        const coachMessage = document.createElement("div");
 
-        coachMessage.textContent = `${userName}, ${data.reply}`;
-
-        coachMessage.classList.add("message", "coach-message");
-
-        chatMessages.appendChild(coachMessage);
+        addCoachMessage(
+            `${userName}, ${data.reply}`
+        );
 
         chatMessages.scrollTop = chatMessages.scrollHeight;
     })
 
     .catch(error => {
-        const coachMessage = document.createElement("div");
 
-        coachMessage.textContent =
-            `Sorry ${userName}, I couldn't connect to the Money Coach right now.`;
-
-        coachMessage.classList.add("message", "coach-message");
-
-        chatMessages.appendChild(coachMessage);
+        addCoachMessage(
+            `Sorry ${userName}, I couldn't connect to the Money Coach right now.`
+        );
 
         console.error("Error:", error);
     });
 });
 
 
-// Create the suggested question buttons
+/* ================================================================
+   ADD USER MESSAGE
+   ================================================================ */
+
+function addUserMessage(message) {
+
+    const userMessage = document.createElement("div");
+
+    userMessage.textContent = message;
+
+    userMessage.classList.add(
+        "message",
+        "user-message"
+    );
+
+    chatMessages.appendChild(userMessage);
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
+/* ================================================================
+   ADD COACH MESSAGE
+   ================================================================ */
+
+function addCoachMessage(message) {
+
+    const coachMessage = document.createElement("div");
+
+    coachMessage.classList.add(
+        "message",
+        "coach-message"
+    );
+
+
+    const label = document.createElement("div");
+
+    label.textContent = "Money Coach";
+
+    label.classList.add("message-label");
+
+
+    const content = document.createElement("div");
+
+    content.textContent = message;
+
+    content.classList.add("message-content");
+
+
+    coachMessage.appendChild(label);
+    coachMessage.appendChild(content);
+
+    chatMessages.appendChild(coachMessage);
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
+/* ================================================================
+   SUGGESTION BUTTONS
+   ================================================================ */
+
 function createSuggestionButtons() {
+
     const suggestedActions = document.createElement("div");
 
-    suggestedActions.classList.add("suggested-actions");
+    suggestedActions.classList.add(
+        "suggested-actions"
+    );
+
 
     const questions = [
         "Analyze my budget",
@@ -106,23 +179,36 @@ function createSuggestionButtons() {
         "Check my credit score"
     ];
 
-    questions.forEach(question => {
+
+    questions.forEach(function(question) {
+
         const button = document.createElement("button");
 
         button.type = "button";
 
         button.textContent = question;
 
-        button.classList.add("suggestion-button");
+        button.classList.add(
+            "suggestion-button"
+        );
+
 
         button.addEventListener("click", function() {
+
             messageInput.value = question;
 
-            chatForm.dispatchEvent(new Event("submit"));
+            chatForm.dispatchEvent(
+                new Event("submit")
+            );
         });
+
 
         suggestedActions.appendChild(button);
     });
 
+
     chatMessages.appendChild(suggestedActions);
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
