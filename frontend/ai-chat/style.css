@@ -61,4 +61,14 @@ body {
 
 .coach-message {
     background-color: #f0f0f0;
+    width: fit-content;
+    margin-right: auto;
+}
+
+.user-message {
+    text-align: right;
+    background-color: #333;
+    color: white;
+    width: fit-content;
+    margin-left: auto;
 }
