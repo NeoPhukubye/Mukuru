@@ -38,6 +38,16 @@ def _factor_score(raw: float) -> int:
     return max(0, min(100, int(round(raw))))
 
 
+def _clamp(raw: float) -> float:
+    """Clamp a raw factor to 0-100.
+
+    The weighted score used unclamped values while the API reported clamped
+    ones, so a consistency factor above 100 inflated the score in a way the
+    published breakdown could not explain. Clamp once, use everywhere.
+    """
+    return max(0.0, min(100.0, raw))
+
+
 def _remittance_consistency(rem_months: int, total_months: int) -> float:
     if total_months == 0:
         return 0.0
@@ -80,11 +90,11 @@ def compute_credit_score(
 ) -> tuple[int, str, list[CreditFactor], list[str]]:
     """Return (score, band, factors, tips)."""
     raw = {
-        "remittance_consistency": _remittance_consistency(remittance_months, total_months),
-        "remittance_amount_stability": _amount_stability(remittance_amounts),
-        "on_time_pattern": _on_time_pattern(late_months, total_months),
-        "tenure": _tenure_score(tenure_months),
-        "savings_behavior": _savings_score(savings_rate),
+        "remittance_consistency": _clamp(_remittance_consistency(remittance_months, total_months)),
+        "remittance_amount_stability": _clamp(_amount_stability(remittance_amounts)),
+        "on_time_pattern": _clamp(_on_time_pattern(late_months, total_months)),
+        "tenure": _clamp(_tenure_score(tenure_months)),
+        "savings_behavior": _clamp(_savings_score(savings_rate)),
     }
 
     details = {
