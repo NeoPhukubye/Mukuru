@@ -36,7 +36,9 @@ startButton.addEventListener("click", function () {
 
         <br><br>
 
-        <button id="continueButton">Continue</button>
+        <button id="continueButton">
+            Continue
+        </button>
     `;
 
     const continueButton = document.getElementById("continueButton");
@@ -64,7 +66,9 @@ startButton.addEventListener("click", function () {
 
             <br><br>
 
-            <button id="incomeButton">Continue</button>
+            <button id="incomeButton">
+                Continue
+            </button>
         `;
 
         const incomeButton = document.getElementById("incomeButton");
@@ -123,11 +127,12 @@ startButton.addEventListener("click", function () {
 
                 <br><br>
 
-                <button id="completeButton">Finish</button>
+                <button id="completeButton">
+                    Finish
+                </button>
             `;
 
-            const completeButton =
-                document.getElementById("completeButton");
+            const completeButton = document.getElementById("completeButton");
 
             completeButton.addEventListener("click", function () {
 
@@ -144,14 +149,16 @@ startButton.addEventListener("click", function () {
                     </button>
                 `;
 
-                const accountButton =
-                    document.getElementById("accountButton");
+                const accountButton = document.getElementById("accountButton");
 
                 accountButton.addEventListener("click", function () {
-    window.location.href = "account.html";
-
+                    window.location.href = "account.html";
                 });
+
             });
+
         });
+
     });
+
 });

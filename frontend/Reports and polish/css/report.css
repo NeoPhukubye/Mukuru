@@ -64,16 +64,49 @@ body {
     font-size: 14px;
 }
 
+
+/* Credit Score */
+
 .credit-score {
     font-size: 48px;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin: 10px 0;
 }
 
 .score-change {
     color: #16833b !important;
     font-weight: bold;
 }
+
+.credit-progress {
+    margin-top: 20px;
+}
+
+.credit-progress-bar {
+    width: 100%;
+    height: 12px;
+    background-color: #eeeeee;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.credit-progress-fill {
+    width: 68%;
+    height: 100%;
+    background-color: #ff6b00;
+    border-radius: 10px;
+}
+
+.credit-score-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #777777;
+}
+
+
+/* Savings Goal */
 
 .progress-bar {
     width: 100%;
@@ -91,136 +124,33 @@ body {
     border-radius: 10px;
 }
 
-.report-actions {
-    text-align: center;
-    margin-top: 25px;
-}
 
-.report-actions button {
-    border: none;
-    padding: 14px 25px;
-    border-radius: 25px;
-    background-color: #ff6b00;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
+/* Remittance History */
 
-.report-actions button:hover {
-    background-color: #e85f00;
-}
-
-@media (max-width: 600px) {
-
-    .report-container {
-        padding: 20px 15px;
-    }
-
-    .report-header h1 {
-        font-size: 28px;
-    }
-
-    .report-card {
-        padding: 20px;
-    }
-
-    .credit-score {
-        font-size: 40px;
-    }
-
-}* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
-    color: #222222;
-}
-
-.report-container {
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 30px 20px;
-}
-
-.report-header {
-    margin-bottom: 25px;
-}
-
-.report-header h1 {
-    font-size: 32px;
-    margin-bottom: 8px;
-}
-
-.report-header p {
-    color: #666666;
-    font-size: 16px;
-}
-
-.report-card {
-    background-color: white;
-    padding: 25px;
-    margin-bottom: 18px;
-    border-radius: 16px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-}
-
-.report-card h2 {
-    font-size: 20px;
-    margin-bottom: 18px;
-}
-
-.report-row {
+.remittance-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eeeeee;
 }
 
-.report-row span {
-    color: #555555;
+.remittance-row:last-child {
+    border-bottom: none;
 }
 
-.report-row strong {
-    font-size: 18px;
+.remittance-row strong {
+    font-size: 16px;
 }
 
-.report-note {
-    margin-top: 12px;
+.remittance-row p {
+    margin-top: 5px;
     color: #777777;
     font-size: 14px;
 }
 
-.credit-score {
-    font-size: 48px;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
 
-.score-change {
-    color: #16833b !important;
-    font-weight: bold;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 12px;
-    background-color: #eeeeee;
-    border-radius: 10px;
-    margin: 15px 0;
-    overflow: hidden;
-}
-
-.progress {
-    width: 80%;
-    height: 100%;
-    background-color: #ff6b00;
-    border-radius: 10px;
-}
+/* Download Button */
 
 .report-actions {
     text-align: center;
@@ -242,6 +172,9 @@ body {
     background-color: #e85f00;
 }
 
+
+/* Mobile */
+
 @media (max-width: 600px) {
 
     .report-container {
@@ -258,6 +191,10 @@ body {
 
     .credit-score {
         font-size: 40px;
+    }
+
+    .remittance-row {
+        gap: 15px;
     }
 
 }

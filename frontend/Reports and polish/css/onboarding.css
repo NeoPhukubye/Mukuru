@@ -11,46 +11,96 @@ body {
 }
 
 .onboarding-container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px 20px;
 }
 
 .welcome-section {
     background-color: white;
-    width: 100%;
-    max-width: 500px;
-    padding: 40px;
-    border-radius: 20px;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .welcome-section h1 {
     font-size: 32px;
     margin-bottom: 15px;
+    line-height: 1.2;
+}
+
+.welcome-section h1::before {
+    content: "";
+    display: block;
+    width: 45px;
+    height: 5px;
+    background-color: #ff6b00;
+    border-radius: 5px;
+    margin: 0 auto 20px auto;
 }
 
 .welcome-section p {
-    font-size: 17px;
+    color: #666666;
+    font-size: 16px;
     line-height: 1.6;
-    margin-bottom: 30px;
-    color: #555555;
+    margin-bottom: 25px;
+}
+
+.welcome-section label {
+    display: block;
+    text-align: left;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid #eeeeee;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.welcome-section label:hover {
+    border-color: #ff6b00;
+}
+
+.welcome-section input {
+    margin-right: 8px;
+}
+
+.welcome-section input[type="number"] {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
 .welcome-section button {
     border: none;
-    padding: 14px 30px;
+    padding: 14px 28px;
     border-radius: 25px;
+    background-color: #ff6b00;
+    color: white;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    background-color: #ff6b00;
-    color: white;
 }
 
 .welcome-section button:hover {
     background-color: #e85f00;
+}
+
+@media (max-width: 600px) {
+
+    .onboarding-container {
+        padding: 20px 15px;
+    }
+
+    .welcome-section {
+        padding: 30px 20px;
+    }
+
+    .welcome-section h1 {
+        font-size: 28px;
+    }
+
 }
