@@ -6,6 +6,7 @@ from sqlmodel import Session
 
 from ..db import engine, list_transactions as _list
 from ..models import (
+    Category,
     ErrorResponse,
     Transaction,
     TransactionBulkCreate,
@@ -18,9 +19,20 @@ router = APIRouter(prefix="/transactions", tags=["transactions"])
 
 
 def _to_model(tx: TransactionCreate) -> Transaction:
-    if not tx.category:
-        tx.category = build_transaction_category(tx)
-    return Transaction(**tx.model_dump())
+    """Build the persistence model.
+
+    The client may send category="other" as a placeholder, in which case the
+    rule-based categoriser fills it in. Previously the guard read
+    `if not tx.category`, which was never true because the field is required,
+    so auto-categorisation never ran.
+    """
+    data = tx.model_dump()
+    if tx.is_remittance:
+        data["category"] = Category.REMITTANCE.value
+    elif data.get("category") in (None, "", Category.OTHER.value):
+        data["category"] = build_transaction_category(tx).value
+    data["type"] = tx.type.value
+    return Transaction(**data)
 
 
 @router.post("", response_model=Transaction, responses={400: {"model": ErrorResponse}})
