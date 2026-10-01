@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mukuru Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-header">
+    <span class="brand-title">mukuru</span>
+    <span> Hello, Grace</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">September Overview</div>
+    <div class="amount">R3,500 <span class="managed-label">Managed</span></div>
+    <p class="sub-text"> R1,200 sent home to Zimbabwe this month</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"> Savings Goals</div>
+    
+    <!-- Goal 1 -->
+    <div class="goal-item">
+      <div class="flex-between">
+        <span>Sister's School Fees</span>
+        <span id="school-text" class="orange-text">R400 / R1,000</span>
+      </div>
+      <div class="progress-bg">
+        <div id="school-bar" class="progress-fill orange-bg" style="width: 40%;"></div>
+      </div>
+      <button id="add-school-btn" class="btn-action">+ Add R50 to goal</button>
+    </div>
+
+    <div class="goal-item">
+      <div class="flex-between">
+        <span>Fridge Back Home</span>
+        <span id="fridge-text" class="blue-text">R300 / R1,500</span>
+      </div>
+      <div class="progress-bg">
+        <div id="fridge-bar" class="progress-fill blue-bg" style="width: 20%;"></div>
+      </div>
+      <button id="add-fridge-btn" class="btn-action">+ Add R50 to goal</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"> Expense Breakdown</div>
+    <div class="flex-between list-row">
+      <span> Remittances Home</span>
+      <span>R1,200 (34%)</span>
+    </div>
+    <div class="flex-between list-row">
+      <span> Groceries & Rent</span>
+      <span>R1,800 (51%)</span>
+    </div>
+    <div class="flex-between list-row">
+      <span>Airtime & Data</span>
+      <span>R200 (6%)</span>
+    </div>
+  </div>
+
+  <!-- Teammate Integration Navigation -->
+  <div class="nav-buttons">
+    <button class="btn-nav btn-primary" onclick="window.location.href='../ai-chat/index.html'">💬 AI Coach</button>
+    <button class="btn-nav btn-secondary" onclick="alert('Navigates to Credit Report (Frontend Lead 3)')">📄 Credit Score</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
