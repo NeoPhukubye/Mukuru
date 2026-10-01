@@ -1,0 +1,103 @@
+{
+  "Transaction": {
+    "type": "object",
+    "description": "A single financial transaction for a user.",
+    "properties": {
+      "id": {"type": "integer", "example": 1},
+      "user_id": {"type": "string", "example": "grace"},
+      "date": {"type": "string", "format": "date", "example": "2026-05-03"},
+      "amount": {"type": "number", "description": "Amount in ZAR", "example": 1250.5},
+      "merchant": {"type": "string", "example": "Checkers"},
+      "description": {"type": "string", "example": "Monthly groceries"},
+      "type": {"type": "string", "enum": ["debit", "credit"], "example": "debit"},
+      "category": {"type": "string", "enum": ["groceries", "rent", "airtime", "transport", "remittance", "utilities", "other"], "example": "groceries"},
+      "is_remittance": {"type": "boolean", "example": false},
+      "recipient_country": {"type": ["string", "null"], "example": "ZW"}
+    },
+    "required": ["user_id", "date", "amount", "merchant", "description", "type", "category", "is_remittance"]
+  },
+  "Goal": {
+    "type": "object",
+    "description": "A savings goal.",
+    "properties": {
+      "id": {"type": "integer", "example": 1},
+      "user_id": {"type": "string", "example": "grace"},
+      "name": {"type": "string", "example": "School fees"},
+      "target_amount": {"type": "number", "description": "Target in ZAR", "example": 12000},
+      "saved_amount": {"type": "number", "description": "Already saved in ZAR", "example": 3500},
+      "deadline": {"type": "string", "format": "date", "example": "2026-12-15"},
+      "created_at": {"type": "string", "format": "date-time"}
+    },
+    "required": ["user_id", "name", "target_amount", "saved_amount", "deadline"]
+  },
+  "CreditScore": {
+    "type": "object",
+    "description": "Proprietary credit score (300-850) with factor breakdown.",
+    "properties": {
+      "user_id": {"type": "string", "example": "grace"},
+      "score": {"type": "integer", "minimum": 300, "maximum": 850, "example": 712},
+      "band": {"type": "string", "enum": ["Poor", "Fair", "Good", "Very Good", "Excellent"], "example": "Good"},
+      "factors": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string", "example": "Remittance consistency"},
+            "weight": {"type": "number", "example": 0.35},
+            "score": {"type": "integer", "minimum": 0, "maximum": 100, "example": 85},
+            "detail": {"type": "string", "example": "11 of 12 months had a remittance"}
+          }
+        }
+      },
+      "tips": {
+        "type": "array",
+        "items": {"type": "string"},
+        "example": ["Send at least one remittance every month", "Keep remittance amounts stable"]
+      },
+      "history": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "month": {"type": "string", "example": "2026-05"},
+            "score": {"type": "integer", "example": 705}
+          }
+        }
+      }
+    },
+    "required": ["user_id", "score", "band", "factors", "tips", "history"]
+  },
+  "Report": {
+    "type": "object",
+    "description": "Structured financial report for a user.",
+    "properties": {
+      "user_id": {"type": "string", "example": "grace"},
+      "account_holder": {"type": "string", "example": "Grace Moyo"},
+      "generated_at": {"type": "string", "format": "date-time"},
+      "period_months": {"type": "integer", "example": 12},
+      "income_summary": {
+        "type": "object",
+        "properties": {
+          "total_income": {"type": "number", "example": 45000},
+          "total_remittances": {"type": "number", "example": 36000},
+          "remittance_months": {"type": "integer", "example": 12},
+          "average_monthly_remittance": {"type": "number", "example": 3000}
+        }
+      },
+      "category_breakdown": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "category": {"type": "string", "example": "groceries"},
+            "total": {"type": "number", "example": 4200},
+            "count": {"type": "integer", "example": 12}
+          }
+        }
+      },
+      "credit_score": {"type": "integer", "example": 712},
+      "disclaimer": {"type": "string", "example": "This report is for informational purposes only and does not constitute financial advice."}
+    },
+    "required": ["user_id", "account_holder", "generated_at", "income_summary", "category_breakdown", "credit_score", "disclaimer"]
+  }
+}
