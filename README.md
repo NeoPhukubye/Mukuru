@@ -86,7 +86,7 @@ Mukuru/
 │   ├── Dashboard/               # Auth + main dashboard
 │   ├── ai-chat/                 # Money Coach chat (calls the API)
 │   └── Reports and polish/      # Onboarding, account, report pages
-├── .github/workflows/ci.yml     # test → smoke test → deploy
+├── .github/workflows/ci.yml     # test → smoke test
 ├── render.yaml                  # Render blueprint
 └── README.md
 ```
@@ -156,10 +156,36 @@ pytest -q
 
 ---
 
+## CI/CD & Deployment
+
+`.github/workflows/ci.yml` runs on every push and pull request:
+
+1. Install dependencies (Python 3.11)
+2. Run `pytest -q`
+3. Smoke-test the server by booting uvicorn on `127.0.0.1` and hitting `/health` and `/analyze-budget?user_id=grace`
+
+**Deployment is handled by Render directly**, not by CI. `render.yaml` sets `autoDeploy: true`, so pushing to `main` triggers a build and deploy without any GitHub Actions step or API keys.
+
+Live at **https://mukuru-jb1l.onrender.com** — `/` redirects to `/docs`, and `/health` returns `{"status": "ok"}`.
+
+To re-apply the blueprint manually:
+
+```bash
+render deploy --dir . --yaml render.yaml
+```
+
+Notes:
+- The root `requirements.txt` is a one-line shim delegating to `backend/requirements.txt`.
+- The SQLite file lives on the service's ephemeral disk, so **data resets on each deploy** — fine for a demo, but a persistent disk or hosted database is needed for real use.
+- Set `GEMINI_API_KEY` in the Render dashboard to activate LLM coach replies.
+
+---
+
 ## API Reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/` | Redirects to `/docs` |
 | GET | `/health` | Liveness probe (used by Render) |
 | POST | `/transactions` | Add a single transaction |
 | POST | `/transactions/bulk` | Add up to 200 transactions at once |
