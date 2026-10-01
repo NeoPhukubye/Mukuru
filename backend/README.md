@@ -61,7 +61,9 @@ pytest -q
 
 ## Deploy
 
-Deploy to **Render** with the `render.yaml` config. See the [Render docs](https://render.com/docs) for details. CI runs on push via `.github/workflows/ci.yml`.
+Deployed to Render at: **https://mukuru-jb1l.onrender.com**
+
+The `render.yaml` config at the repo root handles the build, start command, env vars, and health check. CI runs on push via `.github/workflows/ci.yml`.
 
 ## Disclaimer
 
