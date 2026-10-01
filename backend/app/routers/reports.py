@@ -4,8 +4,9 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Query, Response
 from sqlmodel import Session, select
 
-from ..db import engine
+from ..db import engine, list_transactions_for_period, trailing_months_range
 from ..models import ErrorResponse, ReportResponse, Transaction
+from ..routers.credit import summarise_credit_inputs
 from ..services.categorizer import category_totals
 from ..services.credit_engine import compute_credit_score
 from ..services.report_generator import build_report, render_pdf
@@ -15,35 +16,27 @@ router = APIRouter(prefix="/generate-financial-report", tags=["reports"])
 USER_NAMES = {"grace": "Grace Moyo"}
 
 
-def _compute_credit(user_id: str) -> int:
-    with Session(engine) as session:
-        txs = list(session.exec(select(Transaction).where(Transaction.user_id == user_id)).all())
+def _compute_credit(txs: list[Transaction]) -> int:
+    """Credit score for a report, using the same inputs as /calculate-credit-score."""
     if not txs:
         return 0
-    txs_sorted = sorted(txs, key=lambda t: t.date)
-    start, end = txs_sorted[0].date, txs_sorted[-1].date
-    rem_amounts = [t.amount for t in txs if t.is_remittance]
-    rem_months = len(rem_amounts)
-    late = sum(1 for t in txs if t.is_remittance and t.date.day > 25)
-    tenure = max(1, (end.year - start.year) * 12 + (end.month - start.month) + 1)
-    income = sum(t.amount for t in txs if t.type == "credit")
-    expenses = sum(t.amount for t in txs if t.type == "debit")
-    rate = max(0.0, income - expenses) / income if income > 0 else 0.0
+    data = summarise_credit_inputs(txs)
+    tenure = data["tenure_months"]
     score, _, _, _ = compute_credit_score(
-        user_id=user_id,
-        remittance_months=rem_months,
+        user_id="",
+        remittance_months=data["remittance_months"],
         total_months=tenure,
-        remittance_amounts=rem_amounts,
-        late_months=late,
+        remittance_amounts=data["remittance_amounts"],
+        late_months=data["late_months"],
         tenure_months=tenure,
-        savings_rate=rate,
+        savings_rate=data["savings_rate"],
     )
     return score
 
 
 def _build(user_id: str) -> ReportResponse:
-    with Session(engine) as session:
-        txs = list(session.exec(select(Transaction).where(Transaction.user_id == user_id)).all())
+    start, end = trailing_months_range(12)
+    txs = list_transactions_for_period(user_id, start, end)
     if not txs:
         raise HTTPException(
             status_code=400,
@@ -53,7 +46,7 @@ def _build(user_id: str) -> ReportResponse:
         user_id=user_id,
         account_holder=USER_NAMES.get(user_id, user_id.title()),
         transactions=txs,
-        credit_score=_compute_credit(user_id),
+        credit_score=_compute_credit(txs),
         period_months=12,
     )
 
