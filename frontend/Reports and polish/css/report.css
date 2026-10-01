@@ -172,6 +172,16 @@ body {
     background-color: #e85f00;
 }
 
+.report-actions button:disabled {
+    background-color: #8a8a8a;
+    cursor: not-allowed;
+}
+
+#downloadNote {
+    margin-top: 10px;
+    font-size: 0.85rem;
+}
+
 
 /* Mobile */
 
