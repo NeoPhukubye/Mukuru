@@ -17,7 +17,7 @@
         <header class="account-header">
             <h1>My Account</h1>
 
-            <p>Welcome back to your Money Coach.</p>
+            <p id="accountSubtitle">Welcome back to your Money Coach.</p>
         </header>
 
 
@@ -27,12 +27,12 @@
 
             <p>Your current credit score</p>
 
-            <div class="credit-score">
-                682
+            <div class="credit-score" id="creditScore">
+                —
             </div>
 
-            <p class="score-change">
-                +24 points this month
+            <p class="score-change" id="scoreChange">
+                Loading your score…
             </p>
 
         </section>
@@ -42,13 +42,13 @@
 
             <h2>My Goal</h2>
 
-            <p>School fees</p>
+            <p id="goalName">—</p>
 
             <div class="progress-bar">
-                <div class="progress"></div>
+                <div class="progress" id="goalProgress"></div>
             </div>
 
-            <p>R4,000 saved of R5,000</p>
+            <p id="goalAmount">—</p>
 
         </section>
 
@@ -59,22 +59,22 @@
 
             <div class="money-row">
                 <span>Monthly income</span>
-                <strong>R8,500</strong>
+                <strong id="monthlyIncome">—</strong>
             </div>
 
             <div class="money-row">
                 <span>Money sent home</span>
-                <strong>R2,000</strong>
+                <strong id="sentHome">—</strong>
             </div>
 
             <div class="money-row">
                 <span>Personal expenses</span>
-                <strong>R3,200</strong>
+                <strong id="personalExpenses">—</strong>
             </div>
 
             <div class="money-row">
                 <span>Money saved</span>
-                <strong>R3,300</strong>
+                <strong id="moneySaved">—</strong>
             </div>
 
         </section>
@@ -91,8 +91,8 @@
 
     </main>
 
-
-    <script src="../js/account.js"></script>
+    <script src="api-config.js"></script>
+    <script src="account.js"></script>
 
 </body>
 
