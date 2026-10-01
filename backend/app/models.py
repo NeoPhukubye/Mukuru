@@ -98,6 +98,12 @@ class GoalCreate(BaseModel):
     deadline: date
 
 
+class GoalFundsUpdate(BaseModel):
+    """Body for adding funds to an existing goal."""
+    user_id: str = Field(..., min_length=1, max_length=64)
+    amount: float = Field(..., gt=0, le=1_000_000)
+
+
 class GoalProgress(BaseModel):
     id: int
     name: str
@@ -176,3 +182,17 @@ class CoachChatResponse(BaseModel):
 class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
+
+
+class FxConversion(BaseModel):
+    amount: float
+    from_currency: str
+    to_currency: str
+    converted_amount: float
+    rate: Optional[float] = None
+    symbol: str
+    converted: bool
+
+
+class FxCurrencies(BaseModel):
+    currencies: list[dict]
