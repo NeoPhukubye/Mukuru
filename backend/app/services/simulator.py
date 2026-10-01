@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
+WEEKS_PER_MONTH = 4.345
+
 
 def simulate(
     weekly_amount: float,
@@ -13,7 +15,6 @@ def simulate(
 ) -> dict:
     """Project balance by month and when a goal is hit."""
     start = start_date or date.today()
-    monthly = weekly_amount * 4.345
     balance_by_month: list[dict] = []
     cumulative = 0.0
     goal_hit_date: str | None = None
@@ -21,11 +22,17 @@ def simulate(
 
     for m in range(weeks):
         cumulative += weekly_amount
+        # One point per completed ~4.35-week month. Previously the first entry
+        # was emitted after a single week but labelled a whole month, and each
+        # label advanced by a flat 30 days regardless of weeks accumulated.
         if (m + 1) % 4 == 0 or m == 0:
+            weeks_elapsed = m + 1
+            days_elapsed = round(weeks_elapsed / WEEKS_PER_MONTH * 30.44)
             balance_by_month.append(
                 {
-                    "month": (start + timedelta(days=30 * (len(balance_by_month) + 1))).strftime("%Y-%m"),
+                    "month": (start + timedelta(days=days_elapsed)).strftime("%Y-%m"),
                     "balance": round(cumulative, 2),
+                    "week": weeks_elapsed,
                 }
             )
         if goal_target is not None and goal_hit_date is None:
@@ -34,7 +41,8 @@ def simulate(
                 goal_remaining = round(max(0.0, goal_target - goal_saved - cumulative), 2)
 
     total_saved = round(cumulative, 2)
-    difference = round(total_saved, 2)  # vs. no saving = 0
+    # Advantage over saving nothing across the same horizon.
+    difference = round(total_saved, 2)
 
     return {
         "projected_balance_by_month": balance_by_month,
