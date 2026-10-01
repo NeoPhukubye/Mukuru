@@ -1,0 +1,17 @@
+# Render web service config for Money Coach backend
+# Deploy with: `render deploy --dir backend --yaml render.yaml`
+# See https://render.com/docs/blueprint
+
+services:
+  - type: web
+    name: money-coach-api
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+    healthCheckPath: /health
+    autoDeploy: true
