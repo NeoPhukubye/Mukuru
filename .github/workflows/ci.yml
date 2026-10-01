@@ -35,18 +35,3 @@ jobs:
           curl -fsS http://127.0.0.1:8765/health
           curl -fsS "http://127.0.0.1:8765/analyze-budget?user_id=grace" | head -c 200
           echo
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to Render
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/Render-Platform/render-cli/main/scripts/install.sh | sh
-          render deploy --service "$RENDER_SERVICE_ID" --yes
