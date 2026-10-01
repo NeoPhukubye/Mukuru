@@ -1,0 +1,4 @@
+# Root-level requirements file — delegates to the backend package.
+# This lets Render's build run `pip install -r requirements.txt` from the
+# repo root without needing a custom root directory.
+-r backend/requirements.txt
