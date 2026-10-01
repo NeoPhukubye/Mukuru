@@ -1,0 +1,136 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    color: #222222;
+}
+
+.account-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.account-header {
+    margin-bottom: 25px;
+}
+
+.account-header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.account-header p {
+    color: #666666;
+    font-size: 16px;
+}
+
+.account-card {
+    background-color: white;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.account-card h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.account-card p {
+    color: #666666;
+    margin-bottom: 10px;
+}
+
+.credit-score {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.score-change {
+    color: #16833b !important;
+    font-weight: bold;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background-color: #eeeeee;
+    border-radius: 10px;
+    margin: 15px 0;
+    overflow: hidden;
+}
+
+.progress {
+    width: 80%;
+    height: 100%;
+    background-color: #ff6b00;
+    border-radius: 10px;
+}
+
+.money-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.money-row:last-child {
+    border-bottom: none;
+}
+
+.money-row span {
+    color: #555555;
+}
+
+.money-row strong {
+    color: #222222;
+}
+
+.account-actions {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.account-actions button {
+    border: none;
+    padding: 14px 25px;
+    border-radius: 25px;
+    background-color: #ff6b00;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.account-actions button:hover {
+    background-color: #e85f00;
+}
+
+@media (max-width: 600px) {
+
+    .account-container {
+        padding: 20px 15px;
+    }
+
+    .account-header h1 {
+        font-size: 28px;
+    }
+
+    .account-card {
+        padding: 20px;
+    }
+
+    .credit-score {
+        font-size: 40px;
+    }
+
+}

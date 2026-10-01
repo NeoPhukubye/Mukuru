@@ -148,7 +148,8 @@ startButton.addEventListener("click", function () {
                     document.getElementById("accountButton");
 
                 accountButton.addEventListener("click", function () {
-                    window.location.href = "account.html";
+    window.location.href = "account.html";
+
                 });
             });
         });
