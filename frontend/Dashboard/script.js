@@ -6,7 +6,10 @@
 // ================================================================
 // API CONFIGURATION
 // ================================================================
-const API_BASE_URL = "http://127.0.0.1:8000"; // Local FastAPI server URL
+// Resolved by api-config.js (window.MUKURU_API_BASE / MUKURU_USER_ID), which
+// picks the deployed API, a same-origin API, or a local override.
+const API_BASE_URL = window.MUKURU_API_BASE;
+const USER_ID = window.MUKURU_USER_ID;
 
 // ================================================================
 // 1. TRANSLATIONS
@@ -696,7 +699,10 @@ async function deleteGoal(index) {
         const goalToDelete = goals[index];
         if (goalToDelete.id) {
             try {
-                await fetch(`${API_BASE_URL}/goals/${goalToDelete.id}`, { method: "DELETE" });
+                await fetch(
+                    `${API_BASE_URL}/goals/${goalToDelete.id}?user_id=${encodeURIComponent(USER_ID)}`,
+                    { method: "DELETE" }
+                );
             } catch (err) {
                 console.warn("Backend delete endpoint unreachable, deleting locally:", err);
             }
@@ -736,7 +742,7 @@ async function addMoneyToGoal(index) {
             await fetch(`${API_BASE_URL}/goals/${goals[index].id}/add-funds`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: number })
+                body: JSON.stringify({ user_id: USER_ID, amount: number })
             });
         } catch (err) {
             console.warn("Backend update unreachable, updated locally:", err);
@@ -896,13 +902,17 @@ function setupGoalForm() {
 
             // Post new goal to FastAPI backend router
             try {
-                const response = await fetch(`${API_BASE_URL}/goals/`, {
+                const deadline = new Date();
+                deadline.setMonth(deadline.getMonth() + 6);
+                const response = await fetch(`${API_BASE_URL}/goals`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        title: title,
+                        user_id: USER_ID,
+                        name: title,
                         target_amount: target,
-                        current_amount: 0
+                        saved_amount: 0,
+                        deadline: deadline.toISOString().slice(0, 10)
                     })
                 });
                 if (response.ok) {
@@ -1082,47 +1092,61 @@ function setupLanguageSelectors() {
 // ================================================================
 // 15. BACKEND API FETCH ENGINE
 // ================================================================
+// Maps onto the real FastAPI contract:
+//   /budget/overview   -> GET  /analyze-budget   (current calendar month)
+//   /budget/expenses   -> totals_by_category on the same /analyze-budget call
+//   /goals/            -> GET  /goals
+// The old /budget/* paths do not exist on the API and returned 404.
 
 async function fetchDashboardData() {
     try {
-        // 1. Fetch budget overview from FastAPI
-        const overviewRes = await fetch(`${API_BASE_URL}/budget/overview`);
-        if (overviewRes.ok) {
-            const overviewData = await overviewRes.json();
-            userManaged = overviewData.total_managed || 0;
-            userSentHome = overviewData.sent_home || 0;
-            renderOverview();
+        // 1. Budget overview + expense breakdown, from one endpoint.
+        const budgetRes = await fetch(
+            `${API_BASE_URL}/analyze-budget?user_id=${encodeURIComponent(USER_ID)}`
+        );
+
+        if (budgetRes.ok) {
+            const budget = await budgetRes.json();
+
+            userManaged = budget.total_income || 0;
+            userSentHome = Math.abs(budget.totals_by_category?.remittance || 0);
+
+            // Signed totals: debits are negative. Show outflows as magnitudes
+            // and derive bar widths from their share of total spending.
+            const outflows = Object.entries(budget.totals_by_category || {})
+                .filter(([, amount]) => amount < 0)
+                .map(([category, amount]) => ({ category, amount: Math.abs(amount) }));
+
+            const totalSpend = outflows.reduce((sum, row) => sum + row.amount, 0);
+
+            expenses = outflows.map(row => ({
+                key: row.category,
+                customTitle: row.category,
+                amount: row.amount,
+                percentage: totalSpend > 0 ? (row.amount / totalSpend) * 100 : 0
+            }));
         }
 
-        // 2. Fetch savings goals from FastAPI
-        const goalsRes = await fetch(`${API_BASE_URL}/goals/`);
+        // 2. Savings goals.
+        const goalsRes = await fetch(
+            `${API_BASE_URL}/goals?user_id=${encodeURIComponent(USER_ID)}`
+        );
+
         if (goalsRes.ok) {
             const goalsData = await goalsRes.json();
-            if (Array.isArray(goalsData) && goalsData.length > 0) {
+            if (Array.isArray(goalsData)) {
                 goals = goalsData.map(g => ({
                     id: g.id,
-                    customTitle: g.title,
-                    current: g.current_amount || 0,
+                    customTitle: g.name,
+                    current: g.saved_amount || 0,
                     target: g.target_amount || 0
                 }));
             }
-            renderGoals();
         }
 
-        // 3. Fetch expense breakdown from FastAPI
-        const expensesRes = await fetch(`${API_BASE_URL}/budget/expenses`);
-        if (expensesRes.ok) {
-            const expensesData = await expensesRes.json();
-            if (Array.isArray(expensesData) && expensesData.length > 0) {
-                expenses = expensesData.map(e => ({
-                    key: e.category ? e.category.toLowerCase() : "other",
-                    customTitle: e.category,
-                    amount: e.amount || 0,
-                    percentage: e.percentage || 0
-                }));
-            }
-            renderExpenses();
-        }
+        renderOverview();
+        renderGoals();
+        renderExpenses();
     } catch (error) {
         console.warn("Backend API server not reachable. Running on local state:", error);
         renderOverview();
