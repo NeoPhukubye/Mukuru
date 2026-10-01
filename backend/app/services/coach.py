@@ -1,15 +1,13 @@
-"""Coach chat: intent routing with optional Gemini LLM hook and rule-based fallback."""
+"""Coach chat: intent routing with optional LLM hook and rule-based fallback."""
 from __future__ import annotations
 
 import os
+import re
 
 from ..models import CoachChatResponse
 
-# Gemini configuration. Set GEMINI_API_KEY to enable LLM-backed replies;
-# otherwise the rule-based fallback is used (works fully offline).
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
-GEMINI_TIMEOUT = float(os.environ.get("GEMINI_TIMEOUT", "10"))
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
+LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
 
 
 INTENTS = {
@@ -69,46 +67,37 @@ def _fallback(user_id: str, message: str, intent: str) -> tuple[str, list[str]]:
 def chat(user_id: str, message: str) -> CoachChatResponse:
     intent = _classify(message)
 
-    if GEMINI_API_KEY:
+    if LLM_API_KEY:
         try:
-            return _gemini_chat(user_id, message, intent)
+            return _llm_chat(user_id, message, intent)
         except Exception:
-            pass  # fall through to rule-based fallback
+            pass  # fall through to rule-based
 
     reply, actions = _fallback(user_id, message, intent)
     return CoachChatResponse(reply=reply, suggested_actions=actions)
 
 
-def _gemini_chat(user_id: str, message: str, intent: str) -> CoachChatResponse:
-    """Optional Gemini hook via the REST API. Never called without an API key."""
+def _llm_chat(user_id: str, message: str, intent: str) -> CoachChatResponse:
+    """Optional OpenAI-compatible hook. Never called without an API key."""
     import httpx
 
-    url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
-    )
     resp = httpx.post(
-        url,
-        json={
-            "contents": [
-                {"role": "user", "parts": [{"text": message}]}
-            ],
-            "systemInstruction": {
-                "parts": [
-                    {
-                        "text": (
-                            "You are a friendly Money Coach for a remittance user in South Africa. "
-                            "Be concise, warm, and jargon-free. Use Rands (R) for amounts. "
-                            "Never give medical, legal, or binding financial advice."
-                        )
-                    }
-                ]
-            },
-            "generationConfig": {"temperature": 0.4},
+        "https://api.openai.com/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {LLM_API_KEY}",
+            "Content-Type": "application/json",
         },
-        timeout=GEMINI_TIMEOUT,
+        json={
+            "model": LLM_MODEL,
+            "messages": [
+                {"role": "system", "content": "You are a friendly Money Coach for a remittance user. Be concise, warm, jargon-free."},
+                {"role": "user", "content": message},
+            ],
+            "temperature": 0.4,
+        },
+        timeout=10.0,
     )
     resp.raise_for_status()
     data = resp.json()
-    reply = data["candidates"][0]["content"]["parts"][0]["text"]
+    reply = data["choices"][0]["message"]["content"]
     return CoachChatResponse(reply=reply, suggested_actions=[])
