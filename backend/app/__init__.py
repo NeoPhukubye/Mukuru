@@ -1,0 +1,1 @@
+"""Money Coach backend package."""
