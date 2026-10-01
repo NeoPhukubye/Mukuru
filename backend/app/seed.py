@@ -26,7 +26,7 @@ def _build_transactions() -> list[Transaction]:
     for i in range(12):
         m = _d(i)
         txs.append(Transaction(
-            user_id=USER_ID, date=m, amount=5500.0,
+            user_id=USER_ID, date=m, amount=8000.0,
             merchant="Employer", description="Monthly salary", type="credit",
             category="other", is_remittance=False,
         ))
@@ -71,7 +71,6 @@ def _build_goals() -> list[Goal]:
     now = datetime.now(timezone.utc)
     return [
         Goal(
-            id=1,
             user_id=USER_ID,
             name="School fees",
             target_amount=12000.0,
@@ -80,7 +79,6 @@ def _build_goals() -> list[Goal]:
             created_at=now,
         ),
         Goal(
-            id=2,
             user_id=USER_ID,
             name="Fridge",
             target_amount=4500.0,
