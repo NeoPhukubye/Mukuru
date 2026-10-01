@@ -35,3 +35,23 @@ jobs:
           curl -fsS http://127.0.0.1:8765/health
           curl -fsS "http://127.0.0.1:8765/analyze-budget?user_id=grace" | head -c 200
           echo
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    env:
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+    # render.yaml sets autoDeploy: true, so Render still deploys on push even
+    # when this hook is not configured. The job degrades to a no-op rather than
+    # failing the pipeline when the secret is absent.
+    steps:
+      - name: Trigger Render deploy hook
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL not set; skipping."
+            echo "Render autoDeploy handles deployment from render.yaml."
+            exit 0
+          fi
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "Render deploy hook triggered."
