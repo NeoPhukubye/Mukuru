@@ -17,6 +17,13 @@ _RULES: list[tuple[list[str], Category, bool]] = [
     (["airtime", "data", "wifi", "prepaid", "cellphone", "mobile"], Category.AIRTIME, False),
     (["taxi", "uber", "bolt", "bus", "train", "transport", "fuel", "petrol", "diesel", "parking"], Category.TRANSPORT, False),
     (["electricity", "water", "municipal", "eskom", "telkom", "vodacom", "mtncell", "cell c", "internet", "broadband"], Category.UTILITIES, False),
+    # Entertainment sits below transport and utilities so that "data" on a
+    # streaming bill, or "vodacom" on a TV package, stays in its own bucket.
+    (["entertainment", "entertain", "movie", "cinema", "netflix", "dstv", "youtube premium", "spotify", "music", "club", "liquor", "pub", "concert", "game", "gaming", "betting", "lotto", "sport bar", "theatre", "theater"], Category.ENTERTAINMENT, False),
+    (["pharmacy", "chemist", "clinic", "hospital", "doctor", "dentist", "medical", "health", "physio", "optician", "glasses"], Category.HEALTH, False),
+    (["school", "school fee", "tuition", "college", "university", "course", "textbook", "stationery", "childcare", "creche", "daycare"], Category.EDUCATION, False),
+    (["salon", "barber", "haircut", "beauty", "spa", "gym", "cosmetic", "skincare"], Category.PERSONAL_CARE, False),
+    (["family", "child", "baby", "nappy", "diaper", "school lunch", "granny", "toddler", "toy"], Category.FAMILY, False),
 ]
 
 

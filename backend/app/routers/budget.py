@@ -1,15 +1,26 @@
 """Budget analysis endpoint."""
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Query
+from sqlmodel import Session, select
 
 from ..db import current_month_range, list_transactions, list_transactions_for_period
 from ..models import BudgetAnalysis, ErrorResponse
 from ..services.categorizer import category_totals
 
 router = APIRouter(prefix="/analyze-budget", tags=["budget"])
+
+# "month" is the calendar month and is the default, so existing callers and the
+# CI smoke test are unaffected. The trailing windows exist because a calendar
+# month is a bad unit for a spending breakdown: on the 2nd of the month it holds
+# one salary and one rent payment, which renders as a single bar and reports a
+# savings rate the user has not actually achieved yet.
+Window = Literal["month", "30d", "90d", "180d"]
+
+_WINDOW_DAYS: dict[str, int] = {"30d": 30, "90d": 90, "180d": 180}
 
 
 def _insights(totals: dict[str, float], income: float, expenses: float, rate: float) -> list[str]:
@@ -46,13 +57,22 @@ def _insights(totals: dict[str, float], income: float, expenses: float, rate: fl
 @router.get("", response_model=BudgetAnalysis, responses={400: {"model": ErrorResponse}})
 def analyze_budget(
     user_id: str = Query(..., min_length=1, max_length=64),
+    window: Window = Query("month"),
 ) -> BudgetAnalysis:
-    """Analyse the current calendar month only.
+    """Analyse spending over the requested window.
 
     Earlier versions summed a user's entire history and reported it under the
     current month, which inflated every figure by the length of the record.
     """
-    start, end = current_month_range()
+    if window in _WINDOW_DAYS:
+        today = date.today()
+        start = today - timedelta(days=_WINDOW_DAYS[window] - 1)
+        end = today
+        label = f"last {_WINDOW_DAYS[window]} days"
+    else:
+        start, end = current_month_range()
+        label = start.strftime("%Y-%m")
+
     txs = list_transactions_for_period(user_id, start, end)
 
     if not txs:
@@ -62,6 +82,7 @@ def analyze_budget(
         past = [t for t in list_transactions(user_id) if t.date <= date.today()]
         if past:
             start, end = current_month_range(max(t.date for t in past))
+            label = start.strftime("%Y-%m")
             txs = list_transactions_for_period(user_id, start, end)
 
     if not txs:
@@ -69,7 +90,7 @@ def analyze_budget(
             status_code=400,
             detail={
                 "error": "no_data",
-                "detail": f"No transactions found for this user in {start.strftime('%Y-%m')}.",
+                "detail": f"No transactions found for this user in {label}.",
             },
         )
 
@@ -81,7 +102,7 @@ def analyze_budget(
 
     return BudgetAnalysis(
         user_id=user_id,
-        month=start.strftime("%Y-%m"),
+        month=label,
         totals_by_category={k: round(v, 2) for k, v in totals.items()},
         total_income=income,
         total_expenses=expenses,

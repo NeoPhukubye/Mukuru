@@ -16,9 +16,14 @@ ACCOUNT_HOLDER = DEMO_ACCOUNT_HOLDER
 _MONTHLY = [
     (1, 8000.0, "Employer", "Monthly salary", "credit", "other", False),
     (1, 1800.0, "Landlord", "Rent", "debit", "rent", False),
+    (2, 250.0, "Little Steps Creche", "Creche monthly fee", "debit", "education", False),
     (3, 720.0, "Checkers", "Monthly groceries", "debit", "groceries", False),
+    (4, 180.0, "Clicks Pharmacy", "Monthly medication", "debit", "health", False),
     (5, 180.0, "Vodacom", "Airtime and data", "debit", "airtime", False),
+    (6, 300.0, "DStv", "Entertainment package", "debit", "entertainment", False),
     (7, 320.0, "Taxi", "Work transport", "debit", "transport", False),
+    (8, 120.0, "Ubuntu Hair Salon", "Haircut", "debit", "personal_care", False),
+    (9, 150.0, "Baby City", "Nappies and baby items", "debit", "family", False),
     (10, 260.0, "City Power", "Electricity", "debit", "utilities", False),
     (20, 2500.0, "Mukuru", "Send money home", "debit", "remittance", True),
 ]

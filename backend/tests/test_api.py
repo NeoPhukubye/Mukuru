@@ -254,3 +254,63 @@ def test_error_detail_does_not_leak_internals(client):
     """The 500 handler must not echo raw exception text."""
     res = client.get("/analyze-budget", params={"user_id": ""})
     assert res.status_code == 422
+
+# --- spending windows and category breakdown ------------------------------
+
+def test_budget_window_defaults_to_calendar_month(client):
+    """The default must stay the calendar month so existing callers are unaffected."""
+    body = client.get("/analyze-budget", params={"user_id": USER}).json()
+    assert body["month"] == date.today().strftime("%Y-%m")
+
+
+def test_budget_trailing_window_spans_more_than_one_month(client):
+    """30d covers roughly a full monthly expense cycle; the month view does not.
+
+    Early in a month the calendar view holds only a salary and rent payment,
+    which produced a single-bar breakdown and a savings rate the user had not
+    actually achieved yet.
+    """
+    month = client.get("/analyze-budget", params={"user_id": USER}).json()
+    trailing = client.get(
+        "/analyze-budget", params={"user_id": USER, "window": "30d"}
+    ).json()
+
+    assert trailing["month"] == "last 30 days"
+    assert trailing["total_expenses"] > month["total_expenses"]
+    # A month-to-date figure taken on the 1st or 2nd wildly overstates savings.
+    assert trailing["savings_rate"] < month["savings_rate"]
+
+
+def test_budget_rejects_unknown_window(client):
+    res = client.get("/analyze-budget", params={"user_id": USER, "window": "5y"})
+    assert res.status_code == 422
+
+
+def test_budget_window_includes_multiple_spending_categories(client):
+    """The breakdown the dashboard renders needs more than one outflow."""
+    body = client.get(
+        "/analyze-budget", params={"user_id": USER, "window": "90d"}
+    ).json()
+    outflows = [k for k, v in body["totals_by_category"].items() if v < 0]
+    assert len(outflows) >= 5
+    assert "entertainment" in outflows
+
+
+def test_entertainment_is_categorised():
+    from app.services.categorizer import categorize
+
+    assert categorize("Netflix", "Monthly subscription") == "entertainment"
+    assert categorize("Cineworld", "Movie tickets") == "entertainment"
+    assert categorize("DStv", "Entertainment package") == "entertainment"
+
+
+def test_new_categories_do_not_steal_existing_ones():
+    """Adding rules must not reclassify transactions that were already correct."""
+    from app.services.categorizer import categorize
+
+    assert categorize("Vodacom", "Airtime and data") == "airtime"
+    assert categorize("Eskom", "Electricity") == "utilities"
+    assert categorize("Uber", "Trip to work") == "transport"
+    assert categorize("Checkers", "Monthly groceries") == "groceries"
+    assert categorize("Landlord", "Rent") == "rent"
+    assert categorize("Mukuru", "Send money home", True) == "remittance"

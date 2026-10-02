@@ -21,6 +21,11 @@ class Category(str, Enum):
     TRANSPORT = "transport"
     REMITTANCE = "remittance"
     UTILITIES = "utilities"
+    ENTERTAINMENT = "entertainment"
+    HEALTH = "health"
+    EDUCATION = "education"
+    PERSONAL_CARE = "personal_care"
+    FAMILY = "family"
     OTHER = "other"
 
 

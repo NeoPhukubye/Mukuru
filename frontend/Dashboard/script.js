@@ -52,10 +52,16 @@ const translations = {
 
         signOut: "Sign Out",
 
-        monthlyOverview: "Monthly Money Overview",
+        monthlyOverview: "Money Overview",
+
+        period: "Last 30 days",
+
+        totalSpent: "Total spent",
+
+        sentHome: "{amount} sent home ({period})",
 
         moneyManaged:
-            "Money you managed this month",
+            "Money you received",
 
         savingsGoals: "My Savings Goals",
 
@@ -126,10 +132,16 @@ const translations = {
 
         signOut: "Phuma",
 
-        monthlyOverview: "Isifinyezo Semali Yenyanga",
+        monthlyOverview: "Isifinyezo Semali",
+
+        period: "Izinsuku ezingama-30",
+
+        totalSpent: "Okuhlangene kwemali",
+
+        sentHome: "{amount} ethunyelwa ekhaya ({period})",
 
         moneyManaged:
-            "Imali oyiphethe kule nyanga",
+            "Imali oyiphethe",
 
         savingsGoals: "Imigomo Yami Yokonga",
 
@@ -200,9 +212,15 @@ const translations = {
 
         signOut: "Tswa",
 
-        monthlyOverview: "Kakaretso ya Tjhelete ya Kgwedi",
+        monthlyOverview: "Kakaretso ya Tjhelete",
 
-        moneyManaged: "Tjhelete eo o e laotseng kgweding ena",
+        period: "Liholo tse 30",
+
+        totalSpent: "Tjhelete eohlangotjwa",
+
+        sentHome: "{amount} ephetsoeng hae ({period})",
+
+        moneyManaged: "Tjhelete eo o e laotseng",
 
         savingsGoals: "Dipheo tsa Ka tsa Poloko",
 
@@ -273,10 +291,16 @@ const translations = {
 
         signOut: "Buda",
 
-        monthlyOverview: "Pfupiso yeMari yeMwedzi",
+        monthlyOverview: "Pfupiso yeMari",
+
+        period: "Mazuva 30",
+
+        totalSpent: "Mari yakashandisa",
+
+        sentHome: "{amount} inotumirwa kumba ({period})",
 
         moneyManaged:
-            "Mari yawakabata mumwedzi uno",
+            "Mari yawakabata",
 
         savingsGoals: "Zvinangwa Zvangu Zvekuchengetedza Mari",
 
@@ -347,10 +371,16 @@ const translations = {
 
         signOut: "Tulukani",
 
-        monthlyOverview: "Chidule cha Ndalama za Mwezi",
+        monthlyOverview: "Chidule cha Ndalama",
+
+        period: "Tsiku 30",
+
+        totalSpent: "Ndalama zonse zomwendo",
+
+        sentHome: "{amount} yotumira kwa nyumba ({period})",
 
         moneyManaged:
-            "Ndalama zomwe mwayendetsa mwezi uno",
+            "Ndalama zomwe mwayendetsa",
 
         savingsGoals: "Zolinga Zanga Zosungira Ndalama",
 
@@ -421,10 +451,16 @@ const translations = {
 
         signOut: "Se déconnecter",
 
-        monthlyOverview: "Résumé financier mensuel",
+        monthlyOverview: "Résumé financier",
+
+        period: "Les 30 derniers jours",
+
+        totalSpent: "Total dépensé",
+
+        sentHome: "{amount} envoyés à la famille ({period})",
 
         moneyManaged:
-            "Argent géré ce mois-ci",
+            "Argent reçu",
 
         savingsGoals: "Mes objectifs d'épargne",
 
@@ -495,10 +531,16 @@ const translations = {
 
         signOut: "Sair",
 
-        monthlyOverview: "Resumo financeiro mensal",
+        monthlyOverview: "Resumo financeiro",
+
+        period: "Últimos 30 dias",
+
+        totalSpent: "Total gasto",
+
+        sentHome: "{amount} enviados para casa ({period})",
 
         moneyManaged:
-            "Dinheiro gerido este mês",
+            "Dinheiro recebido",
 
         savingsGoals: "Os meus objetivos de poupança",
 
@@ -770,10 +812,77 @@ async function addMoneyToGoal(index) {
 
 
 // ================================================================
-// 8. EXPENSES (Starts empty for new users)
+// 9. DISPLAY EXPENSES
 // ================================================================
+// The breakdown is analysed over a trailing window rather than the current
+// calendar month. Early in a month the calendar view holds only a salary
+// and a rent payment, which rendered as a single bar and reported a
+// savings rate the user had not achieved yet. 30 days always spans a full
+// cycle of the seeded monthly expenses.
+const SPENDING_WINDOW = "30d";
 
 let expenses = [];
+let spendingTotal = 0;
+
+// Human-readable names per language. Falls back to a tidied-up version of
+// the raw category key when a language is missing an entry.
+const CATEGORY_LABELS = {
+    en: {
+        groceries: "Groceries", rent: "Rent", airtime: "Airtime & Data",
+        transport: "Transport", remittance: "Money Sent Home", utilities: "Utilities",
+        entertainment: "Entertainment", health: "Health", education: "Education",
+        personal_care: "Personal Care", family: "Family", other: "Other"
+    },
+    zu: {
+        groceries: "Ukudla", rent: "I-Renti", airtime: "Idatha ne-Airtime",
+        transport: "Transport", remittance: "Imali Ethunyelwa Ekhaya", utilities: "Izinsiza",
+        entertainment: "Ezokuhlola", health: "Ukunakekelwa Kwezempilo", education: "Imfundo",
+        personal_care: "Ukunakekela Umuntu", family: "Umndeni", other: "Okunye"
+    },
+    st: {
+        groceries: "Lijo", rent: "Tjhelete ea Ntlo", airtime: "Mohlomo",
+        transport: "Tjhalefo", remittance: "Chelete eo Ephetsoeng Hae", utilities: "Lisebelisoa",
+        entertainment: "Tlhoki", health: "Bophelo", education: "Thuto",
+        personal_care: "Tlhokomelo", family: "Ho Mohlapa", other: "Tse ding"
+    },
+    sn: {
+        groceries: "Zvokudya", rent: "Rent", airtime: "Maseva",
+        transport: "Kufambisira", remittance: "Mari Inotumirwa Kumba", utilities: "Mashandisi",
+        entertainment: "Zvakataiso", health: "Hutende", education: "Dzidziso",
+        personal_care: "Kuchengeteka", family: "Mhuri", other: "Zvimwe"
+    },
+    ny: {
+        groceries: "Zakudyera", rent: "Rent", airtime: "Airtime ndi Data",
+        transport: "Mayendo", remittance: "Ndalama Yotumira Kwa Nyumba", utilities: "Ntchito",
+        entertainment: "Zokwimbira", health: "Ulimba", education: "Maphunziro",
+        personal_care: "Kusamala", family: "Banja", other: "Zina"
+    },
+    fr: {
+        groceries: "Courses", rent: "Loyer", airtime: "Crédit et données",
+        transport: "Transport", remittance: "Argent envoyé à la famille", utilities: "Services",
+        entertainment: "Loisirs", health: "Santé", education: "Éducation",
+        personal_care: "Soins personnels", family: "Famille", other: "Autre"
+    },
+    pt: {
+        groceries: "Compras", rent: "Renda", airtime: "Crédito e dados",
+        transport: "Transporte", remittance: "Dinheiro enviado para casa", utilities: "Serviços",
+        entertainment: "Entretenimento", health: "Saúde", education: "Educação",
+        personal_care: "Cuidados pessoais", family: "Família", other: "Outro"
+    }
+};
+
+function categoryLabel(key) {
+    const table = CATEGORY_LABELS[currentLanguage] || CATEGORY_LABELS.en;
+    if (table[key]) {
+        return table[key];
+    }
+    return String(key).replace(/_/g, " ").replace(/^./, c => c.toUpperCase());
+}
+
+function periodLabel() {
+    const table = translations[currentLanguage] || translations.en;
+    return table.period || translations.en.period;
+}
 
 
 // ================================================================
@@ -800,11 +909,7 @@ function renderExpenses() {
     }
 
     expenses.forEach(function (expense) {
-        const title =
-            translations[currentLanguage][expense.key] ||
-            translations.en[expense.key] ||
-            expense.customTitle ||
-            expense.key;
+        const title = categoryLabel(expense.key);
 
         const row = document.createElement("div");
         row.className = "expense-item";
@@ -813,9 +918,10 @@ function renderExpenses() {
         row.innerHTML = `
             <div class="expense-top" style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                 <span>${esc(title)}</span>
-                <strong>
-                    ${userSymbol}${expense.amount.toLocaleString()}
-                </strong>
+                <span>
+                    <strong>${userSymbol}${expense.amount.toLocaleString()}</strong>
+                    <span style="color: #888; font-size: 0.85rem;">${expense.percentage.toFixed(1)}%</span>
+                </span>
             </div>
 
             <div class="progress-bar" style="background: #333; height: 8px; border-radius: 4px; overflow: hidden;">
@@ -828,6 +934,16 @@ function renderExpenses() {
 
         container.appendChild(row);
     });
+
+    // Total, so the bars have something to add up to.
+    const totalRow = document.createElement("div");
+    totalRow.className = "expense-total";
+    totalRow.style.cssText = "display: flex; justify-content: space-between; margin-top: 14px; padding-top: 10px; border-top: 1px solid #333;";
+    totalRow.innerHTML = `
+        <span>${esc(translations[currentLanguage]?.totalSpent || translations.en.totalSpent)}</span>
+        <strong>${userSymbol}${spendingTotal.toLocaleString()}</strong>
+    `;
+    container.appendChild(totalRow);
 }
 
 
@@ -839,13 +955,22 @@ function renderOverview() {
     const totalEl = document.getElementById("total-managed");
     const summaryEl = document.getElementById("remittance-summary");
     const greetingEl = document.getElementById("user-greeting");
+    const periodEl = document.getElementById("overview-period");
 
     if (totalEl) {
         totalEl.textContent = `${userSymbol}${userManaged.toLocaleString()}`;
     }
 
+    if (periodEl) {
+        periodEl.textContent = periodLabel();
+    }
+
     if (summaryEl) {
-        summaryEl.textContent = `${userSymbol}${userSentHome.toLocaleString()} sent home this month`;
+        const template = translations[currentLanguage]?.sentHome
+            || translations.en.sentHome;
+        summaryEl.textContent = template
+            .replace("{amount}", `${userSymbol}${userSentHome.toLocaleString()}`)
+            .replace("{period}", periodLabel());
     }
 
     if (greetingEl) {
@@ -1294,32 +1419,32 @@ function setupLanguageSelectors() {
 async function fetchDashboardData() {
     try {
         const [budgetRes, goalsRes] = await Promise.all([
-            window.mukuruFetch(`/analyze-budget?user_id=${encodeURIComponent(USER_ID)}`),
+            window.mukuruFetch(`/analyze-budget?user_id=${encodeURIComponent(USER_ID)}&window=${SPENDING_WINDOW}`),
             window.mukuruFetch(`/goals?user_id=${encodeURIComponent(USER_ID)}`)
         ]);
 
-        // Overview and expenses both come from /analyze-budget, which is scoped
-        // to the current calendar month. The old /budget/overview and
-        // /budget/expenses paths do not exist on the API and returned 404.
+        // Overview and expenses both come from /analyze-budget. The old
+        // /budget/overview and /budget/expenses paths do not exist on the API
+        // and returned 404.
         if (budgetRes.ok) {
             const budget = await budgetRes.json();
 
             userManaged = budget.total_income || 0;
             userSentHome = Math.abs(budget.totals_by_category?.remittance || 0);
 
-            // Signed totals: debits are negative. Show only outflows, and size
-            // each bar by its share of total spending.
+            // Signed totals: debits are negative. Show only outflows, largest
+            // first, each sized by its share of total spending.
             const outflows = Object.entries(budget.totals_by_category || {})
                 .filter(([, amount]) => amount < 0)
-                .map(([category, amount]) => ({ category, amount: Math.abs(amount) }));
+                .map(([category, amount]) => ({ category, amount: Math.abs(amount) }))
+                .sort((a, b) => b.amount - a.amount);
 
-            const totalSpend = outflows.reduce((sum, row) => sum + row.amount, 0);
+            spendingTotal = outflows.reduce((sum, row) => sum + row.amount, 0);
 
             expenses = outflows.map(row => ({
                 key: row.category,
-                customTitle: row.category,
                 amount: row.amount,
-                percentage: totalSpend > 0 ? (row.amount / totalSpend) * 100 : 0
+                percentage: spendingTotal > 0 ? (row.amount / spendingTotal) * 100 : 0
             }));
         }
 
