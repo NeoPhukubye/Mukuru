@@ -998,6 +998,43 @@ function validatePhoneField(input) {
 }
 
 // ================================================================
+// PIN VALIDATION
+// ================================================================
+// Auth itself is mocked for the demo, but the field still has to behave:
+// `required` alone lets a single digit through, and maxlength="4" silently
+// truncates a longer entry instead of telling the user. Exactly four
+// digits, validated the same way as the phone so the browser blocks submit
+// and renders the message inline rather than in an alert().
+
+const PIN_LENGTH = 4;
+
+function validatePinField(input) {
+    if (!input) {
+        return true;
+    }
+
+    const value = input.value.trim();
+    let error = "";
+
+    if (value === "") {
+        error = "Please enter your PIN.";
+    } else if (!/^[0-9]+$/.test(value)) {
+        error = "Your PIN must be digits only.";
+    } else if (value.length !== PIN_LENGTH) {
+        error = "Your PIN must be exactly " + PIN_LENGTH + " digits.";
+    }
+
+    input.setCustomValidity(error);
+
+    if (error) {
+        input.reportValidity();
+        return false;
+    }
+
+    return true;
+}
+
+// ================================================================
 // 12. AUTHENTICATION & LOGIN FLOW
 // ================================================================
 
@@ -1033,10 +1070,12 @@ function setupAuthFlow() {
 
     const loginPhone = document.getElementById("login-id");
     const regPhone = document.getElementById("reg-phone");
+    const loginPin = document.getElementById("login-pin");
+    const regPin = document.getElementById("reg-pin");
 
     // Clear a stale error as soon as the user edits, so the bubble does
     // not linger while they retype.
-    [loginPhone, regPhone].forEach(function (field) {
+    [loginPhone, regPhone, loginPin, regPin].forEach(function (field) {
         if (field) {
             field.addEventListener("input", function () {
                 field.setCustomValidity("");
@@ -1049,6 +1088,10 @@ function setupAuthFlow() {
             e.preventDefault();
 
             if (!validatePhoneField(loginPhone)) {
+                return;
+            }
+
+            if (!validatePinField(loginPin)) {
                 return;
             }
 
@@ -1068,6 +1111,10 @@ function setupAuthFlow() {
             e.preventDefault();
 
             if (!validatePhoneField(regPhone)) {
+                return;
+            }
+
+            if (!validatePinField(regPin)) {
                 return;
             }
 

@@ -201,8 +201,11 @@
         <input
           type="password"
           id="login-pin"
+          inputmode="numeric"
+          autocomplete="one-time-code"
           placeholder="••••"
           maxlength="4"
+          pattern="[0-9]{4}"
           required>
 
       </div>
@@ -383,8 +386,11 @@
         <input
           type="password"
           id="reg-pin"
+          inputmode="numeric"
+          autocomplete="new-password"
           placeholder="••••"
           maxlength="4"
+          pattern="[0-9]{4}"
           required>
 
       </div>
