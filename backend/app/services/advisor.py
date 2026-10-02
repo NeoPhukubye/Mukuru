@@ -66,7 +66,10 @@ def advise(
         weights["emergency_fund"] = 0.60
         weights["goal_savings"] = 0.30
         weights["investment"] = 0.10
-        rationale += f" Your emergency fund is short by R{emergency_short:,.0f}, so we're weighting it heavily."
+        rationale += (
+            f" A {RULES['emergency_fund_months']}-month emergency fund is about "
+            f"R{emergency_target:,.0f}, so we're weighting that pool most heavily."
+        )
 
     pools = [
         {
