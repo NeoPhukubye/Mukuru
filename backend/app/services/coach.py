@@ -23,11 +23,20 @@ GEMINI_TIMEOUT = float(os.environ.get("GEMINI_TIMEOUT", "20"))
 
 
 INTENTS = {
-    "budget": ["budget", "spend", "spending", "saving", "savings rate", "surplus", "deficit", "analyze"],
-    "goal": ["goal", "school", "fridge", "target", "progress", "deadline"],
-    "simulate": ["simulate", "what if", "project", "how much", "weeks", "weekly", "a week"],
-    "credit": ["credit", "score", "credit score", "improve"],
-    "report": ["report", "pdf", "statement", "summary"],
+    "budget": [
+        "budget", "spend", "spending", "saving", "savings rate", "surplus",
+        "deficit", "analyze", "earn", "salary", "income", "make",
+    ],
+    "goal": [
+        "goal", "school", "fridge", "target", "progress", "deadline",
+        "car", "buy", "save up", "purchase", "house",
+    ],
+    "simulate": [
+        "simulate", "what if", "project", "how much", "weeks", "weekly",
+        "a week", "save", "put away", "saving r",
+    ],
+    "credit": ["credit", "score", "credit score", "improve", "rating"],
+    "report": ["report", "pdf", "statement", "summary", "document"],
 }
 
 
