@@ -5,7 +5,7 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Query
 
-from ..db import current_month_range, list_transactions_for_period
+from ..db import current_month_range, list_transactions, list_transactions_for_period
 from ..models import BudgetAnalysis, ErrorResponse
 from ..services.categorizer import category_totals
 
@@ -54,6 +54,15 @@ def analyze_budget(
     """
     start, end = current_month_range()
     txs = list_transactions_for_period(user_id, start, end)
+
+    if not txs:
+        # Early in a new month there may be nothing yet. Falling back to the
+        # latest month that has data keeps the dashboard populated instead of
+        # rendering a 400, which is what the frontend shows on empty state.
+        past = [t for t in list_transactions(user_id) if t.date <= date.today()]
+        if past:
+            start, end = current_month_range(max(t.date for t in past))
+            txs = list_transactions_for_period(user_id, start, end)
 
     if not txs:
         raise HTTPException(
