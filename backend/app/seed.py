@@ -1,7 +1,7 @@
 """Seed demo data for user 'Grace'. Idempotent: skips if already present."""
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from sqlmodel import Session, select
 
@@ -11,79 +11,66 @@ from .models import Goal, Transaction
 USER_ID = "grace"
 ACCOUNT_HOLDER = "Grace Moyo"
 
+# (day, amount, merchant, description, type, category, is_remittance)
+_MONTHLY = [
+    (1, 8000.0, "Employer", "Monthly salary", "credit", "other", False),
+    (1, 1800.0, "Landlord", "Rent", "debit", "rent", False),
+    (3, 720.0, "Checkers", "Monthly groceries", "debit", "groceries", False),
+    (5, 180.0, "Vodacom", "Airtime and data", "debit", "airtime", False),
+    (7, 320.0, "Taxi", "Work transport", "debit", "transport", False),
+    (10, 260.0, "City Power", "Electricity", "debit", "utilities", False),
+    (20, 2500.0, "Mukuru", "Send money home", "debit", "remittance", True),
+]
 
-def _d(months_ago: int, day: int = 15) -> date:
-    today = date.today()
+
+def _month_start(months_ago: int, today: date) -> date:
     y, m = today.year, today.month - months_ago
     while m <= 0:
         m += 12
         y -= 1
-    return date(y, m, min(day, 28))
+    return date(y, m, 1)
 
 
 def _build_transactions() -> list[Transaction]:
+    """12 months of history, never dated after today.
+
+    The previous seed dated every month on fixed days without checking the
+    calendar, so on the 2nd of the month it created transactions dated later
+    that month — including a salary that had not been paid yet. Those rows
+    then made the budget and report claim money that did not exist yet.
+    """
+    today = date.today()
     txs: list[Transaction] = []
     for i in range(12):
-        m = _d(i)
-        txs.append(Transaction(
-            user_id=USER_ID, date=m, amount=8000.0,
-            merchant="Employer", description="Monthly salary", type="credit",
-            category="other", is_remittance=False,
-        ))
-        txs.append(Transaction(
-            user_id=USER_ID, date=m.replace(day=1), amount=1800.0,
-            merchant="Landlord", description="Rent", type="debit",
-            category="rent", is_remittance=False,
-        ))
-        txs.append(Transaction(
-            user_id=USER_ID, date=m.replace(day=3), amount=720.0,
-            merchant="Checkers", description="Monthly groceries", type="debit",
-            category="groceries", is_remittance=False,
-        ))
-        txs.append(Transaction(
-            user_id=USER_ID, date=m.replace(day=5), amount=180.0,
-            merchant="Vodacom", description="Airtime and data", type="debit",
-            category="airtime", is_remittance=False,
-        ))
-        txs.append(Transaction(
-            user_id=USER_ID, date=m.replace(day=7), amount=320.0,
-            merchant="Taxi", description="Work transport", type="debit",
-            category="transport", is_remittance=False,
-        ))
-        txs.append(Transaction(
-            user_id=USER_ID, date=m.replace(day=10), amount=260.0,
-            merchant="City Power", description="Electricity", type="debit",
-            category="utilities", is_remittance=False,
-        ))
-        # Remittance — mostly consistent R2 500, sent around day 20.
-        # One late month (i == 5 -> 7 days late) to create an on-time pattern.
-        remit_day = 20 if i != 5 else 27
-        txs.append(Transaction(
-            user_id=USER_ID, date=m.replace(day=remit_day), amount=2500.0,
-            merchant="Mukuru", description="Send money home", type="debit",
-            category="remittance", is_remittance=True, recipient_country="ZW",
-        ))
+        first = _month_start(i, today)
+        for day, amount, merchant, desc, typ, cat, is_rem in _MONTHLY:
+            # One late remittance (month 5) so the on-time factor is not perfect.
+            if is_rem and i == 5:
+                day = 27
+            d = first.replace(day=day)
+            if d > today:
+                continue
+            txs.append(Transaction(
+                user_id=USER_ID, date=d, amount=amount, merchant=merchant,
+                description=desc, type=typ, category=cat, is_remittance=is_rem,
+                recipient_country="ZW" if is_rem else None,
+            ))
     return txs
 
 
 def _build_goals() -> list[Goal]:
+    """Deadlines are relative to today so the demo never opens on an expired goal."""
     today = date.today()
     now = datetime.now(timezone.utc)
     return [
         Goal(
-            user_id=USER_ID,
-            name="School fees",
-            target_amount=12000.0,
-            saved_amount=3500.0,
-            deadline=date(today.year, 12, 15),
+            user_id=USER_ID, name="School fees", target_amount=12000.0,
+            saved_amount=3500.0, deadline=today + timedelta(days=75),
             created_at=now,
         ),
         Goal(
-            user_id=USER_ID,
-            name="Fridge",
-            target_amount=4500.0,
-            saved_amount=1200.0,
-            deadline=date(today.year, 11, 30),
+            user_id=USER_ID, name="Fridge", target_amount=4500.0,
+            saved_amount=1200.0, deadline=today + timedelta(days=60),
             created_at=now,
         ),
     ]
