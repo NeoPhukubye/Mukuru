@@ -197,9 +197,7 @@ function createSuggestionButtons() {
 
             messageInput.value = question;
 
-            chatForm.dispatchEvent(
-                new Event("submit")
-            );
+            chatForm.requestSubmit();
         });
 
 
