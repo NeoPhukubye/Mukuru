@@ -5,9 +5,10 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
-    color: #222222;
+   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
 }
 
 .onboarding-container {
@@ -18,14 +19,16 @@ body {
 }
 
 .welcome-section {
-    background-color: white;
+    background-color: #1e1e1e;
     padding: 40px 30px;
     border-radius: 16px;
+    border: 1px solid #2a2a2a;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
     text-align: center;
 }
 
 .welcome-section h1 {
+    color: #ffffff;
     font-size: 32px;
     margin-bottom: 15px;
     line-height: 1.2;
@@ -42,10 +45,18 @@ body {
 }
 
 .welcome-section p {
-    color: #666666;
+    color: #bdbdbd;
     font-size: 16px;
     line-height: 1.6;
     margin-bottom: 25px;
+}
+
+.brand-title {
+    display: block;
+    color: #ff6b00;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
 }
 
 .welcome-section label {
@@ -53,7 +64,8 @@ body {
     text-align: left;
     padding: 12px;
     margin-bottom: 8px;
-    border: 1px solid #eeeeee;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
     border-radius: 10px;
     cursor: pointer;
 }
@@ -67,11 +79,13 @@ body {
 }
 
 .welcome-section input[type="number"] {
-    width: 100%;
+     width: 100%;
     padding: 14px;
-    border: 1px solid #dddddd;
+    border: 1px solid #3a3a3a;
     border-radius: 10px;
     font-size: 16px;
+    background-color: #121212;
+    color: #ffffff;
 }
 
 .welcome-section button {
