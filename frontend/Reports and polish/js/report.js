@@ -10,7 +10,6 @@
 (function () {
     "use strict";
 
-    var API_BASE_URL = window.MUKURU_API_BASE;
     var USER_ID = window.MUKURU_USER_ID;
     var SYMBOL = "R";
     var SCORE_MIN = 300;
@@ -153,15 +152,15 @@
 
     function load() {
         Promise.all([
-            fetch(API_BASE_URL + "/analyze-budget?user_id=" + encodeURIComponent(USER_ID))
+            window.mukuruFetch("/analyze-budget?user_id=" + encodeURIComponent(USER_ID))
                 .then(function (r) { return r.ok ? r.json() : null; }),
-            fetch(API_BASE_URL + "/goals?user_id=" + encodeURIComponent(USER_ID))
+            window.mukuruFetch("/goals?user_id=" + encodeURIComponent(USER_ID))
                 .then(function (r) { return r.ok ? r.json() : []; }),
-            fetch(API_BASE_URL + "/calculate-credit-score?user_id=" + encodeURIComponent(USER_ID))
+            window.mukuruFetch("/calculate-credit-score?user_id=" + encodeURIComponent(USER_ID))
                 .then(function (r) { return r.ok ? r.json() : null; }),
-            fetch(API_BASE_URL + "/transactions?user_id=" + encodeURIComponent(USER_ID))
+            window.mukuruFetch("/transactions?user_id=" + encodeURIComponent(USER_ID))
                 .then(function (r) { return r.ok ? r.json() : { items: [] }; }),
-            fetch(API_BASE_URL + "/generate-financial-report?user_id=" + encodeURIComponent(USER_ID))
+            window.mukuruFetch("/generate-financial-report?user_id=" + encodeURIComponent(USER_ID))
                 .then(function (r) { return r.ok ? r.json() : null; })
         ]).then(function (results) {
             var budget = results[0];
@@ -194,13 +193,13 @@
     var downloadButton = el("downloadButton");
     if (downloadButton) {
         downloadButton.addEventListener("click", function () {
-            var url = API_BASE_URL + "/generate-financial-report/pdf?user_id=" +
+            var url = "/generate-financial-report/pdf?user_id=" +
                 encodeURIComponent(USER_ID);
 
             downloadButton.disabled = true;
             setText("downloadNote", "Preparing your report…");
 
-            fetch(url)
+            window.mukuruFetch(url)
                 .then(function (response) {
                     if (!response.ok) { throw new Error("HTTP " + response.status); }
                     return response.blob();
