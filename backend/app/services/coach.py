@@ -113,11 +113,34 @@ def _fallback(message: str, intent: str, ctx: dict) -> tuple[str, list[str]]:
             reply += " " + detail
         return reply, ["Simulate R100/week", "Check my goals"]
 
-    if intent == "goal" and goals:
-        return (
-            " ".join(g.nudge for g in focus[:2]),
-            ["Simulate R100/week", "Analyze my budget"],
-        )
+    if intent == "goal":
+        lower_msg = message.lower()
+        # A named asset the user does not already track: answer about *that*
+        # item instead of listing unrelated goals.
+        new_asset = next((a for a in ("car", "house") if a in lower_msg and a not in
+                          {g.name.lower() for g in goals}), None)
+        if new_asset:
+            income = budget.total_income if budget else 12000.0
+            monthly = income * 0.15
+            months = 6
+            reply = (
+                f"Saving for a {new_asset} is a great milestone, Grace! With your "
+                f"R{income:,.0f} monthly income, putting aside about 15% "
+                f"(R{monthly:,.0f}/month) would build a down payment in about "
+                f"{months} months. "
+                f"Would you like me to add '{new_asset.title()}' as a new savings goal?"
+            )
+            return reply, [
+                f"Yes, add {new_asset.title()} goal",
+                "Simulate R500/week",
+                "Check my budget",
+            ]
+
+        if focus:
+            return (
+                " ".join(g.nudge for g in focus[:2]),
+                ["Simulate R100/week", "Analyze my budget"],
+            )
 
     if intent == "credit" and credit:
         return (
