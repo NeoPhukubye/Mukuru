@@ -48,7 +48,7 @@ const translations = {
         moneyCoachIntro:
             "Get simple help with saving, spending and reaching your goals.",
 
-        welcome: "👋 Welcome",
+        welcome: "Welcome",
 
         signOut: "Sign Out",
 
@@ -71,7 +71,7 @@ const translations = {
 
         expenseBreakdown: "Where Your Money Goes",
 
-        moneyTip: "💡 Money Tip",
+        moneyTip: "Money Tip",
 
         coachMessage:
             "Need help with your money? Ask for simple guidance.",
@@ -122,7 +122,7 @@ const translations = {
         moneyCoachIntro:
             "Thola usizo olulula lokonga, ukusebenzisa imali nokufinyelela imigomo yakho.",
 
-        welcome: "👋 Siyakwamukela",
+        welcome: "Siyakwamukela",
 
         signOut: "Phuma",
 
@@ -145,7 +145,7 @@ const translations = {
 
         expenseBreakdown: "Lapho Imali Yakho Iya Khona",
 
-        moneyTip: "💡 Ithiphu Yemali",
+        moneyTip: "Ithiphu Yemali",
 
         coachMessage:
             "Udinga usizo ngemali yakho? Buza ukuze uthole usizo olulula.",
@@ -196,7 +196,7 @@ const translations = {
         moneyCoachIntro:
             "Fumana thuso e bonolo ya ho boloka tjhelete le ho fihlela dipheo tsa hao.",
 
-        welcome: "👋 Rea o amohela",
+        welcome: "Rea o amohela",
 
         signOut: "Tswa",
 
@@ -218,7 +218,7 @@ const translations = {
 
         expenseBreakdown: "Moo Tjhelete ya Hao e Yang",
 
-        moneyTip: "💡 Keletso ya Tjhelete",
+        moneyTip: "Keletso ya Tjhelete",
 
         coachMessage:
             "O hloka thuso ka tjhelete ya hao? Botsa Mokoetlisi wa Ditjhelete.",
@@ -269,7 +269,7 @@ const translations = {
         moneyCoachIntro:
             "Wana rubatsiro rwakareruka pakuchengetedza mari nekuzadzisa zvinangwa zvako.",
 
-        welcome: "👋 Tinokugamuchirai",
+        welcome: "Tinokugamuchirai",
 
         signOut: "Buda",
 
@@ -292,7 +292,7 @@ const translations = {
 
         expenseBreakdown: "Mari Yako Iri Kuenda Kupi",
 
-        moneyTip: "💡 Zano reMari",
+        moneyTip: "Zano reMari",
 
         coachMessage:
             "Unoda rubatsiro nemari yako? Bvunza Mudzidzisi Wemari.",
@@ -343,7 +343,7 @@ const translations = {
         moneyCoachIntro:
             "Pezani thandizo losavuta losungira ndalama ndi kukwaniritsa zolinga zanu.",
 
-        welcome: "👋 Takulandirani",
+        welcome: "Takulandirani",
 
         signOut: "Tulukani",
 
@@ -366,7 +366,7 @@ const translations = {
 
         expenseBreakdown: "Komwe Ndalama Zanu Zimapita",
 
-        moneyTip: "💡 Malangizo a Ndalama",
+        moneyTip: "Malangizo a Ndalama",
 
         coachMessage:
             "Mukufuna thandizo pa ndalama zanu? Funsani mlangizi.",
@@ -417,7 +417,7 @@ const translations = {
         moneyCoachIntro:
             "Obtenez des conseils simples pour économiser et atteindre vos objectifs.",
 
-        welcome: "👋 Bienvenue",
+        welcome: "Bienvenue",
 
         signOut: "Se déconnecter",
 
@@ -440,7 +440,7 @@ const translations = {
 
         expenseBreakdown: "Où va votre argent",
 
-        moneyTip: "💡 Conseil financier",
+        moneyTip: "Conseil financier",
 
         coachMessage:
             "Besoin d'aide avec votre argent ? Demandez des conseils simples.",
@@ -491,7 +491,7 @@ const translations = {
         moneyCoachIntro:
             "Receba ajuda simples para poupar, gastar e alcançar os seus objetivos.",
 
-        welcome: "👋 Bem-vindo",
+        welcome: "Bem-vindo",
 
         signOut: "Sair",
 
@@ -514,7 +514,7 @@ const translations = {
 
         expenseBreakdown: "Para onde vai o seu dinheiro",
 
-        moneyTip: "💡 Dica financeira",
+        moneyTip: "Dica financeira",
 
         coachMessage:
             "Precisa de ajuda com o seu dinheiro? Peça orientação simples.",
@@ -845,7 +845,7 @@ function renderOverview() {
     }
 
     if (summaryEl) {
-        summaryEl.textContent = `💸 ${userSymbol}${userSentHome.toLocaleString()} sent home this month`;
+        summaryEl.textContent = `${userSymbol}${userSentHome.toLocaleString()} sent home this month`;
     }
 
     if (greetingEl) {
