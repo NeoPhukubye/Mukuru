@@ -951,6 +951,53 @@ function setupGoalForm() {
 
 
 // ================================================================
+// PHONE VALIDATION
+// ================================================================
+// The country code lives in its own select, so the input holds the
+// national number only. The placeholder ("82 123 4567") is 9 digits,
+// while longer schemes run to 13, so a single fixed length would be
+// wrong for some countries. Separators are stripped before counting so
+// "82 123 4567", "082-123-4567" and "(082) 123 4567" all pass, while a
+// stray letter or a lone digit is rejected.
+
+const MIN_PHONE_DIGITS = 9;
+const MAX_PHONE_DIGITS = 13;
+
+function readPhoneDigits(value) {
+    return (value || "").replace(/[^0-9]/g, "");
+}
+
+function validatePhoneField(input) {
+    if (!input) {
+        return true;
+    }
+
+    const digits = readPhoneDigits(input.value);
+    let error = "";
+
+    if (digits.length === 0) {
+        error = input.value.trim() === ""
+            ? "Please enter your mobile number."
+            : "Please enter digits only - no letters or symbols.";
+    } else if (digits.length < MIN_PHONE_DIGITS || digits.length > MAX_PHONE_DIGITS) {
+        error = "Please enter a valid mobile number (" +
+            MIN_PHONE_DIGITS + "-" + MAX_PHONE_DIGITS +
+            " digits, e.g. 82 123 4567).";
+    }
+
+    // setCustomValidity lets the browser block submit and show the message
+    // itself, so the error styling matches the rest of the form validation.
+    input.setCustomValidity(error);
+
+    if (error) {
+        input.reportValidity();
+        return false;
+    }
+
+    return true;
+}
+
+// ================================================================
 // 12. AUTHENTICATION & LOGIN FLOW
 // ================================================================
 
@@ -984,9 +1031,27 @@ function setupAuthFlow() {
         });
     }
 
+    const loginPhone = document.getElementById("login-id");
+    const regPhone = document.getElementById("reg-phone");
+
+    // Clear a stale error as soon as the user edits, so the bubble does
+    // not linger while they retype.
+    [loginPhone, regPhone].forEach(function (field) {
+        if (field) {
+            field.addEventListener("input", function () {
+                field.setCustomValidity("");
+            });
+        }
+    });
+
     if (loginForm) {
         loginForm.addEventListener("submit", async function (e) {
             e.preventDefault();
+
+            if (!validatePhoneField(loginPhone)) {
+                return;
+            }
+
             const selectedCurrency = document.getElementById("login-currency")?.value || "ZAR";
             userSymbol = currencySymbols[selectedCurrency] || "R";
 
@@ -1001,6 +1066,11 @@ function setupAuthFlow() {
     if (registerForm) {
         registerForm.addEventListener("submit", async function (e) {
             e.preventDefault();
+
+            if (!validatePhoneField(regPhone)) {
+                return;
+            }
+
             const nameInput = document.getElementById("reg-name")?.value.trim();
             const selectedCurrency = document.getElementById("reg-currency")?.value || "ZAR";
 
