@@ -87,13 +87,29 @@ def calculate_credit_score(
         savings_rate=data["savings_rate"],
     )
 
-    # Deterministic history: interpolate from 300 up to the final score.
+    # Real month-by-month history: score using only the data available up to
+    # the end of each month. This was previously a straight line interpolated
+    # from 300 to the final score, which invented an improvement that never
+    # happened.
     history: list[dict] = []
-    month_date = date(start.year, start.month, 1)
-    for i in range(tenure_months):
-        t = (i + 1) / tenure_months
-        history.append({"month": month_date.strftime("%Y-%m"), "score": int(round(300 + t * (score - 300)))})
-        month_date = (month_date.replace(day=28) + timedelta(days=4)).replace(day=1)
+    cursor = date(start.year, start.month, 1)
+    last_month = date(data["end"].year, data["end"].month, 1)
+    while cursor <= last_month:
+        next_month = (cursor.replace(day=28) + timedelta(days=4)).replace(day=1)
+        upto = [t for t in txs if t.date < next_month]
+        if upto:
+            month_data = summarise_credit_inputs(upto)
+            month_score, _, _, _ = compute_credit_score(
+                user_id=user_id,
+                remittance_months=month_data["remittance_months"],
+                total_months=month_data["tenure_months"],
+                remittance_amounts=month_data["remittance_amounts"],
+                late_months=month_data["late_months"],
+                tenure_months=month_data["tenure_months"],
+                savings_rate=month_data["savings_rate"],
+            )
+            history.append({"month": cursor.strftime("%Y-%m"), "score": month_score})
+        cursor = next_month
 
     return CreditScoreResponse(
         user_id=user_id,
