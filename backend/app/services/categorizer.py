@@ -1,21 +1,39 @@
 """Rule-based transaction categorizer. Pure functions, no I/O."""
 from __future__ import annotations
 
+import re
+
 from ..models import Category, TransactionCreate
 
 # Ordered patterns: first match wins.
+# (keywords, category, is_remittance_rule)
 _RULES: list[tuple[list[str], Category, bool]] = [
     (["remittance", "send money", "sendhome", "home remit", "mukuru send"], Category.REMITTANCE, True),
-    (["rent", "lease", "municipal rates"], Category.RENT, False),
-    (["grocer", "grocery", "checkers", "shoprite", "pick n pay", "pick n pay", "spar", "supermarket", "food"], Category.GROCERIES, False),
-    (["airtime", "data", "internet", "wifi", "prepaid", "cellphone", "mobile"], Category.AIRTIME, False),
+    (["rent", "rental", "lease", "municipal rates"], Category.RENT, False),
+    (["grocery", "groceries", "checkers", "shoprite", "pick n pay", "spar", "supermarket", "food"], Category.GROCERIES, False),
+    # "internet" is deliberately not in the airtime list. It appeared in both
+    # this rule and the utilities one, and because airtime is checked first a
+    # Telkom internet bill was filed as airtime.
+    (["airtime", "data", "wifi", "prepaid", "cellphone", "mobile"], Category.AIRTIME, False),
     (["taxi", "uber", "bolt", "bus", "train", "transport", "fuel", "petrol", "diesel", "parking"], Category.TRANSPORT, False),
     (["electricity", "water", "municipal", "eskom", "telkom", "vodacom", "mtncell", "cell c", "internet", "broadband"], Category.UTILITIES, False),
 ]
 
 
 def _matches(text: str, keywords: list[str]) -> bool:
-    return any(k in text for k in keywords)
+    """Whole-word match, tolerating a simple plural "s".
+
+    Plain substring matching was too loose: "Current account fee" matched
+    "rent" inside "current", "Business loan" matched "bus", and "Spare parts"
+    matched "spar".
+
+    Only "s" is allowed, never "es". Allowing "es" would re-introduce the
+    "spare parts" -> SPAR supermarket false positive.
+    """
+    return any(
+        re.search(rf"\b{re.escape(keyword)}(?:s)?\b", text)
+        for keyword in keywords
+    )
 
 
 def categorize(
