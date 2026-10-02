@@ -20,12 +20,13 @@ services:
       - key: DATABASE_URL
         value: "sqlite:///./moneycoach.db"
       - key: GEMINI_API_KEY
-        # Set your Gemini API key in the Render dashboard.
-        # Leave blank to run fully offline with rule-based coach replies.
-        value: ""
+        # Set the real key in the Render dashboard. `sync: false` keeps this
+        # blueprint from overwriting it with a blank value on the next apply.
+        sync: false
       - key: GEMINI_MODEL
-        value: "gemini-2.0-flash"
+        # gemini-2.0-flash was retired by Google on 1 June 2026.
+        value: "gemini-3.5-flash"
       - key: GEMINI_TIMEOUT
-        value: "10"
+        value: "20"
     healthCheckPath: /health
     autoDeploy: true
