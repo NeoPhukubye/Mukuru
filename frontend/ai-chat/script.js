@@ -8,10 +8,12 @@
 // timeout and retries once, and the "thinking" bubble explains the wait
 // rather than looking like a hang.
 
-const userId = window.MUKURU_USER_ID;
+const userId = window.MUKURU_USER_ID || "grace";
 
-let userName = "";
-let waitingForName = true;
+// The demo signs in as a known user, so the coach greets them by name
+// instead of asking who they are. See the static first message in
+// index.html; the quick actions below attach to it on load.
+let userName = "Grace";
 let busy = false;
 
 const chatForm = document.querySelector(".chat-input");
@@ -107,6 +109,17 @@ function setBusy(value) {
 // SEND
 // ================================================================
 
+// The greeting itself lives in index.html so it paints without waiting on
+// this script; the quick actions are appended here once the DOM is ready.
+window.addEventListener("DOMContentLoaded", function () {
+    createSuggestionButtons([
+        "Analyze my budget",
+        "Check my goals",
+        "What if I save R100 a week?",
+        "Check my credit score"
+    ]);
+});
+
 chatForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -114,25 +127,6 @@ chatForm.addEventListener("submit", function (event) {
 
     // The busy guard stops a double submit sending the message twice.
     if (message === "" || busy) {
-        return;
-    }
-
-    if (waitingForName) {
-        userName = message;
-        waitingForName = false;
-
-        addUserMessage(userName);
-        addCoachMessage(
-            "Nice to meet you, " + userName + "! How can I help you with your money today?"
-        );
-        createSuggestionButtons([
-            "Analyze my budget",
-            "Check my goals",
-            "What if I save R100 a week?",
-            "Check my credit score"
-        ]);
-
-        messageInput.value = "";
         return;
     }
 
