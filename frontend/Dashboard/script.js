@@ -1043,6 +1043,43 @@ function validatePinField(input) {
 // ================================================================
 // 12. AUTHENTICATION & LOGIN FLOW
 // ================================================================
+// There is no real authentication: the forms only pick a currency and a
+// display name, and every API call uses the demo user from the shared
+// config. Without a record of having "signed in", reloading the page or
+// navigating back to it re-showed the sign-in form, so a judge who
+// refreshed mid-demo was asked to log in again without having logged out.
+//
+// sessionStorage is the right scope: it survives a refresh and a back
+// navigation, and it is discarded when the tab closes, so a shared or
+// public machine does not stay signed in. It is cleared explicitly on
+// logout. All access is guarded because it throws in some private modes.
+
+const SESSION_KEY = "mukuruSession";
+
+function readSession() {
+    try {
+        return JSON.parse(sessionStorage.getItem(SESSION_KEY)) || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function writeSession(session) {
+    try {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    } catch (e) {
+        // Session persistence is a convenience here; signing in must still
+        // work when storage is unavailable.
+    }
+}
+
+function clearSession() {
+    try {
+        sessionStorage.removeItem(SESSION_KEY);
+    } catch (e) {
+        // Nothing to do - there is no session to clear.
+    }
+}
 
 function setupAuthFlow() {
     const tabLogin = document.getElementById("tab-login");
@@ -1104,6 +1141,8 @@ function setupAuthFlow() {
             const selectedCurrency = document.getElementById("login-currency")?.value || "ZAR";
             userSymbol = currencySymbols[selectedCurrency] || "R";
 
+            writeSession({ signedIn: true, currency: selectedCurrency, name: userName });
+
             authScreen.style.display = "none";
             dashboardScreen.style.display = "block";
 
@@ -1132,6 +1171,8 @@ function setupAuthFlow() {
             }
             userSymbol = currencySymbols[selectedCurrency] || "R";
 
+            writeSession({ signedIn: true, currency: selectedCurrency, name: userName });
+
             authScreen.style.display = "none";
             dashboardScreen.style.display = "block";
 
@@ -1142,9 +1183,26 @@ function setupAuthFlow() {
 
     if (logoutBtn) {
         logoutBtn.addEventListener("click", function () {
+            clearSession();
             dashboardScreen.style.display = "none";
             authScreen.style.display = "block";
         });
+    }
+
+    // Restore the previous sign-in. This runs before fetchDashboardData() in
+    // the bootstrap, so a refresh goes straight back to the dashboard instead
+    // of flashing the sign-in form while the API call is still in flight.
+    const session = readSession();
+
+    if (session && session.signedIn) {
+        if (session.currency) {
+            userSymbol = currencySymbols[session.currency] || "R";
+        }
+        if (session.name) {
+            userName = session.name;
+        }
+        authScreen.style.display = "none";
+        dashboardScreen.style.display = "block";
     }
 }
 
