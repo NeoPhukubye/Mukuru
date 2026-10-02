@@ -5,11 +5,12 @@ from datetime import date, datetime, timedelta, timezone
 
 from sqlmodel import Session, select
 
+from .config import DEMO_ACCOUNT_HOLDER, DEMO_USER_ID
 from .db import engine
 from .models import Goal, Transaction
 
-USER_ID = "grace"
-ACCOUNT_HOLDER = "Grace Moyo"
+USER_ID = DEMO_USER_ID
+ACCOUNT_HOLDER = DEMO_ACCOUNT_HOLDER
 
 # (day, amount, merchant, description, type, category, is_remittance)
 _MONTHLY = [

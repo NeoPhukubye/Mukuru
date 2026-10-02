@@ -36,13 +36,15 @@
     <!-- CHAT MESSAGES -->
     <main class="chat-messages">
 
-        <!-- Initial coach message -->
+        <!-- Initial coach message. Kept as static markup so it paints without
+             waiting on script.js; script.js rewrites the name span from
+             shared/api-config.js so an overridden user is greeted correctly. -->
         <div class="message coach-message">
             <div class="message-label">Money Coach</div>
 
 
             <div class="message-content">
-                Hi Grace! 👋 I'm your Money Coach. How can I help you with your budget, savings goals, or credit score today?
+                Hi <span data-user-name>Grace</span>! 👋 I'm your Money Coach. How can I help you with your budget, savings goals, or credit score today?
             </div>
 
 
@@ -69,7 +71,7 @@
 
 </div>
 
-<script src="api-config.js"></script>
+<script src="../shared/api-config.js"></script>
 <script src="script.js"></script>
 
 </body>

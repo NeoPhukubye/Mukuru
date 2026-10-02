@@ -8,12 +8,12 @@
 // timeout and retries once, and the "thinking" bubble explains the wait
 // rather than looking like a hang.
 
-const userId = window.MUKURU_USER_ID || "grace";
+const userId = window.MUKURU_USER_ID;
 
 // The demo signs in as a known user, so the coach greets them by name
 // instead of asking who they are. See the static first message in
 // index.html; the quick actions below attach to it on load.
-let userName = "Grace";
+let userName = window.MUKURU_USER_NAME;
 let busy = false;
 
 const chatForm = document.querySelector(".chat-input");
@@ -112,6 +112,11 @@ function setBusy(value) {
 // The greeting itself lives in index.html so it paints without waiting on
 // this script; the quick actions are appended here once the DOM is ready.
 window.addEventListener("DOMContentLoaded", function () {
+    // Keep the static greeting in step with the configured user.
+    document.querySelectorAll("[data-user-name]").forEach(function (node) {
+        node.textContent = userName;
+    });
+
     createSuggestionButtons([
         "Analyze my budget",
         "Check my goals",

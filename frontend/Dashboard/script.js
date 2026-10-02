@@ -6,8 +6,9 @@
 // ================================================================
 // API CONFIGURATION
 // ================================================================
-// Resolved by api-config.js (window.MUKURU_API_BASE / MUKURU_USER_ID), which
-// picks the deployed API, a same-origin API, or a local override.
+// Resolved by shared/api-config.js (window.MUKURU_API_BASE /
+// window.MUKURU_USER), which picks the deployed API, a same-origin API, or
+// a local override. The demo identity is declared there, not here.
 const API_BASE_URL = window.MUKURU_API_BASE;
 const USER_ID = window.MUKURU_USER_ID;
 
@@ -543,7 +544,7 @@ let currentLanguage = "en";
 let userSymbol = "R";
 let userManaged = 0; 
 let userSentHome = 0; 
-let userName = "Grace";
+let userName = window.MUKURU_USER_NAME;
 
 
 // ================================================================
@@ -746,7 +747,10 @@ async function addMoneyToGoal(index) {
     }
 
     try {
-        const res = await window.mukuruFetch(`/goals/${goals[index].id}/add-funds`, {
+        // Not mukuruFetch: this increments saved_amount server-side, so a blind
+        // retry after an aborted timeout could credit the goal twice. An abort
+        // only proves we stopped waiting, not that the server never saw it.
+        const res = await window.mukuruFetchOnce(`/goals/${goals[index].id}/add-funds`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ user_id: USER_ID, amount: number })
@@ -910,7 +914,9 @@ function setupGoalForm() {
             // Create server-side first. Pushing locally and then attempting the
             // API meant a failed request still showed the goal in the list.
             try {
-                const response = await window.mukuruFetch("/goals", {
+                // Not mukuruFetch: a retry after an aborted timeout would create a second
+                // goal with the same name.
+                const response = await window.mukuruFetchOnce("/goals", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

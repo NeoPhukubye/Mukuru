@@ -4,6 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Query, Response
 from sqlmodel import Session, select
 
+from ..config import account_holder_for
 from ..db import engine, list_transactions_for_period, trailing_months_range
 from ..models import ErrorResponse, ReportResponse, Transaction
 from ..routers.credit import summarise_credit_inputs
@@ -12,8 +13,6 @@ from ..services.credit_engine import compute_credit_score
 from ..services.report_generator import build_report, render_pdf
 
 router = APIRouter(prefix="/generate-financial-report", tags=["reports"])
-
-USER_NAMES = {"grace": "Grace Moyo"}
 
 
 def _compute_credit(txs: list[Transaction]) -> int:
@@ -44,7 +43,7 @@ def _build(user_id: str) -> ReportResponse:
         )
     return build_report(
         user_id=user_id,
-        account_holder=USER_NAMES.get(user_id, user_id.title()),
+        account_holder=account_holder_for(user_id),
         transactions=txs,
         credit_score=_compute_credit(txs),
         period_months=12,

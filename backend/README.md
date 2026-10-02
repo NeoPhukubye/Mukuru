@@ -47,10 +47,20 @@ Demo user: `grace` (password not required — just pass `user_id=grace`).
 |----------|---------|---------|
 | `DATABASE_URL` | `sqlite:///./moneycoach.db` | Database connection |
 | `GEMINI_API_KEY` | _(empty)_ | Enable Gemini-backed coach replies |
-| `GEMINI_MODEL` | `gemini-2.0-flash` | Gemini model name |
-| `GEMINI_TIMEOUT` | `10` | Gemini request timeout in seconds |
+| `GEMINI_MODEL` | `gemini-3.5-flash` | Gemini model name |
+| `GEMINI_TIMEOUT` | `20` | Gemini request timeout in seconds |
+| `DEMO_USER_ID` | `grace` | Demo persona the seed data and reports target |
+| `DEMO_USER_NAME` | `Grace` | Display name shown in the UI |
+| `DEMO_ACCOUNT_HOLDER` | `Grace Moyo` | Name printed on the generated report |
+| `DEMO_CURRENCY_SYMBOL` | `R` | Currency symbol used in coach prose |
+| `CORS_ORIGINS` | `*` | Comma-separated allowed origins |
 | `HOST` | `0.0.0.0` | Bind host |
 | `PORT` | `8000` | Bind port |
+
+The demo identity lives in `app/config.py`; the frontend reads the equivalent
+values from `frontend/shared/api-config.js`, which every page loads. Override
+either without editing code via `window.__MUKURU_USER__` /
+`window.__MUKURU_API__` or the `mukuruUserId` / `mukuruApiBase` localStorage keys.
 
 ## Tests
 
