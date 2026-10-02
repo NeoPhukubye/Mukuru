@@ -85,7 +85,7 @@ function createSuggestionButtons(questions) {
         button.classList.add("suggestion-button");
         button.addEventListener("click", function () {
             messageInput.value = question;
-            chatForm.dispatchEvent(new Event("submit", { cancelable: true }));
+            chatForm.requestSubmit();
         });
         box.appendChild(button);
     });
