@@ -208,3 +208,17 @@ body {
     }
 
 }
+/* Back to Dashboard. Plain anchor so it works without JS. */
+.back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #555555;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.back-link:hover,
+.back-link:focus {
+    color: #16833b;
+    text-decoration: underline;
+}

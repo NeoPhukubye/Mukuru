@@ -389,3 +389,18 @@ body {
         padding: 10px;
     }
 }
+
+/* Back to Dashboard. Plain anchor so it works without JS. */
+.back-link {
+    display: inline-block;
+    margin-bottom: 6px;
+    color: #cccccc;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.back-link:hover,
+.back-link:focus {
+    color: #FF6B00;
+    text-decoration: underline;
+}

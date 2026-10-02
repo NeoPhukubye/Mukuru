@@ -30,6 +30,20 @@
             font-size: 1rem;
             cursor: pointer;
         }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #555555;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .back-link:hover,
+        .back-link:focus {
+            color: #16833b;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -38,12 +52,14 @@
     <!--
         Entry point for the Reports and polish app.
 
-        The Dashboard's "View My Reports" button links here, so this file used
-        to be empty and the navigation dead-ended. It now routes onward to the
-        onboarding flow or straight to the account.
+        The Dashboard's "View My Reports" button currently jumps straight to
+        pages/onboarding.html, so this routing page is not reached by the UI.
+        It is kept as a reachable entry point and now carries a back link.
     -->
 
     <main class="onboarding-container">
+
+        <a class="back-link" href="../Dashboard/index.html">&larr; Back to Dashboard</a>
 
         <section class="welcome-section entry-actions">
 
