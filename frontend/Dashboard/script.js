@@ -612,10 +612,17 @@ function loadSavedLanguage() {
 
 
 // ================================================================
-// 5. GOALS (Dynamic Array - Syncs with LocalStorage & Backend API)
+// 5. GOALS (Backend is the single source of truth)
 // ================================================================
+//
+// Goals used to be cached in localStorage as well as in the API. After a
+// server restart the browser still showed goals the API no longer had, and
+// adding money updated only the screen. Every mutation now goes through the
+// API and the server's response is what gets rendered.
 
-let goals = JSON.parse(localStorage.getItem("mukuruGoals")) || [];
+let goals = [];
+
+const esc = window.mukuruEsc || function (value) { return value; };
 
 // ================================================================
 // 6. DISPLAY GOALS
@@ -630,10 +637,6 @@ function renderGoals() {
 
     container.innerHTML = "";
 
-    // Save updated goals list to local storage
-    localStorage.setItem("mukuruGoals", JSON.stringify(goals));
-
-    // Show message if user has no active goals
     if (goals.length === 0) {
         container.innerHTML = `
             <p style="color: #aaa; font-size: 0.9rem; text-align: center; padding: 12px 0;">
@@ -644,9 +647,13 @@ function renderGoals() {
     }
 
     goals.forEach(function (goal, index) {
-        let title = goal.customTitle || (translations[currentLanguage][goal.titleKey] || translations.en[goal.titleKey] || goal.title);
+        const title = goal.customTitle
+            || (translations[currentLanguage][goal.titleKey]
+                || translations.en[goal.titleKey]
+                || goal.title
+                || "");
 
-        const percentage = goal.target > 0 
+        const percentage = goal.target > 0
             ? Math.min(Math.round((goal.current / goal.target) * 100), 100)
             : 0;
 
@@ -654,15 +661,16 @@ function renderGoals() {
         goalCard.className = "goal-item";
         goalCard.style.cssText = "margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #2a2a2a;";
 
+        // The title is user-supplied, so it is escaped before going into
+        // innerHTML. It was injected raw before.
         goalCard.innerHTML = `
             <div class="goal-top" style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                <strong>${title}</strong>
+                <strong>${esc(title)}</strong>
                 <span style="color: #FF6B00; font-weight: bold;">${percentage}%</span>
             </div>
 
             <div class="progress-bar" style="background: #333; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 8px;">
-                <div
-                    class="progress-fill"
+                <div class="progress-fill"
                     style="width: ${percentage}%; background: #FF6B00; height: 100%; transition: width 0.3s ease;">
                 </div>
             </div>
@@ -683,7 +691,7 @@ function renderGoals() {
                         class="btn-action"
                         style="background: #333; color: #ff5252; border: 1px solid #444; border-radius: 6px; padding: 4px 8px; cursor: pointer;"
                         onclick="deleteGoal(${index})">
-                        🗑️
+                        TRASH
                     </button>
                 </div>
             </div>
@@ -693,22 +701,29 @@ function renderGoals() {
     });
 }
 
-// Function to allow deleting a goal
+
+// Delete a goal, confirming with the API before dropping it from the view.
 async function deleteGoal(index) {
-    if (confirm("Are you sure you want to delete this goal?")) {
-        const goalToDelete = goals[index];
-        if (goalToDelete.id) {
-            try {
-                await fetch(
-                    `${API_BASE_URL}/goals/${goalToDelete.id}?user_id=${encodeURIComponent(USER_ID)}`,
-                    { method: "DELETE" }
-                );
-            } catch (err) {
-                console.warn("Backend delete endpoint unreachable, deleting locally:", err);
-            }
+    if (!confirm("Are you sure you want to delete this goal?")) {
+        return;
+    }
+
+    const goal = goals[index];
+
+    try {
+        const res = await window.mukuruFetch(
+            `/goals/${goal.id}?user_id=${encodeURIComponent(USER_ID)}`,
+            { method: "DELETE" }
+        );
+        // 404 means it is already gone, which is the state we wanted anyway.
+        if (!res.ok && res.status !== 404) {
+            throw new Error("HTTP " + res.status);
         }
         goals.splice(index, 1);
         renderGoals();
+    } catch (err) {
+        console.warn("Delete failed:", err);
+        alert("Could not delete the goal. Please try again.");
     }
 }
 
@@ -726,37 +741,35 @@ async function addMoneyToGoal(index) {
     const number = Number(amount);
 
     if (!amount || isNaN(number) || number <= 0) {
-
-        alert(
-            "Please enter a valid amount."
-        );
-
+        alert("Please enter a valid amount.");
         return;
     }
 
-    goals[index].current += number;
-
-    // Send update to FastAPI backend if goal ID exists
-    if (goals[index].id) {
-        try {
-            await fetch(`${API_BASE_URL}/goals/${goals[index].id}/add-funds`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: USER_ID, amount: number })
-            });
-        } catch (err) {
-            console.warn("Backend update unreachable, updated locally:", err);
+    try {
+        const res = await window.mukuruFetch(`/goals/${goals[index].id}/add-funds`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: USER_ID, amount: number })
+        });
+        if (!res.ok) {
+            throw new Error("HTTP " + res.status);
         }
+        const updated = await res.json();
+        // Trust the server's number rather than our own arithmetic.
+        goals[index].current = updated.saved_amount;
+        renderGoals();
+    } catch (err) {
+        console.warn("Add funds failed:", err);
+        alert("Could not add money right now. Nothing was changed.");
     }
-
-    renderGoals();
 }
+
 
 // ================================================================
 // 8. EXPENSES (Starts empty for new users)
 // ================================================================
 
-let expenses = JSON.parse(localStorage.getItem("mukuruExpenses")) || [];
+let expenses = [];
 
 
 // ================================================================
@@ -771,9 +784,6 @@ function renderExpenses() {
     }
 
     container.innerHTML = "";
-
-    // Save state
-    localStorage.setItem("mukuruExpenses", JSON.stringify(expenses));
 
     // Show empty message for new users
     if (expenses.length === 0) {
@@ -798,7 +808,7 @@ function renderExpenses() {
 
         row.innerHTML = `
             <div class="expense-top" style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                <span>${title}</span>
+                <span>${esc(title)}</span>
                 <strong>
                     ${userSymbol}${expense.amount.toLocaleString()}
                 </strong>
@@ -893,18 +903,14 @@ function setupGoalForm() {
                 return;
             }
 
-            const newGoalObj = {
-                titleKey: null,
-                customTitle: title,
-                current: 0,
-                target: target
-            };
+            // The goal form has no date field, so default to six months out.
+            const deadline = new Date();
+            deadline.setMonth(deadline.getMonth() + 6);
 
-            // Post new goal to FastAPI backend router
+            // Create server-side first. Pushing locally and then attempting the
+            // API meant a failed request still showed the goal in the list.
             try {
-                const deadline = new Date();
-                deadline.setMonth(deadline.getMonth() + 6);
-                const response = await fetch(`${API_BASE_URL}/goals`, {
+                const response = await window.mukuruFetch("/goals", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -915,15 +921,21 @@ function setupGoalForm() {
                         deadline: deadline.toISOString().slice(0, 10)
                     })
                 });
-                if (response.ok) {
-                    const savedBackendGoal = await response.json();
-                    newGoalObj.id = savedBackendGoal.id;
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
                 }
+                const saved = await response.json();
+                goals.push({
+                    id: saved.id,
+                    customTitle: saved.name,
+                    current: saved.saved_amount || 0,
+                    target: saved.target_amount
+                });
             } catch (err) {
-                console.warn("Backend server offline, saved goal locally:", err);
+                console.warn("Create goal failed:", err);
+                alert("Could not save the goal. Please try again.");
+                return;
             }
-
-            goals.push(newGoalObj);
 
             form.style.display = "none";
 
@@ -1100,19 +1112,22 @@ function setupLanguageSelectors() {
 
 async function fetchDashboardData() {
     try {
-        // 1. Budget overview + expense breakdown, from one endpoint.
-        const budgetRes = await fetch(
-            `${API_BASE_URL}/analyze-budget?user_id=${encodeURIComponent(USER_ID)}`
-        );
+        const [budgetRes, goalsRes] = await Promise.all([
+            window.mukuruFetch(`/analyze-budget?user_id=${encodeURIComponent(USER_ID)}`),
+            window.mukuruFetch(`/goals?user_id=${encodeURIComponent(USER_ID)}`)
+        ]);
 
+        // Overview and expenses both come from /analyze-budget, which is scoped
+        // to the current calendar month. The old /budget/overview and
+        // /budget/expenses paths do not exist on the API and returned 404.
         if (budgetRes.ok) {
             const budget = await budgetRes.json();
 
             userManaged = budget.total_income || 0;
             userSentHome = Math.abs(budget.totals_by_category?.remittance || 0);
 
-            // Signed totals: debits are negative. Show outflows as magnitudes
-            // and derive bar widths from their share of total spending.
+            // Signed totals: debits are negative. Show only outflows, and size
+            // each bar by its share of total spending.
             const outflows = Object.entries(budget.totals_by_category || {})
                 .filter(([, amount]) => amount < 0)
                 .map(([category, amount]) => ({ category, amount: Math.abs(amount) }));
@@ -1127,11 +1142,6 @@ async function fetchDashboardData() {
             }));
         }
 
-        // 2. Savings goals.
-        const goalsRes = await fetch(
-            `${API_BASE_URL}/goals?user_id=${encodeURIComponent(USER_ID)}`
-        );
-
         if (goalsRes.ok) {
             const goalsData = await goalsRes.json();
             if (Array.isArray(goalsData)) {
@@ -1143,16 +1153,13 @@ async function fetchDashboardData() {
                 }));
             }
         }
-
-        renderOverview();
-        renderGoals();
-        renderExpenses();
     } catch (error) {
-        console.warn("Backend API server not reachable. Running on local state:", error);
-        renderOverview();
-        renderGoals();
-        renderExpenses();
+        console.warn("Backend API not reachable:", error);
     }
+
+    renderOverview();
+    renderGoals();
+    renderExpenses();
 }
 
 
