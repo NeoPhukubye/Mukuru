@@ -30,16 +30,23 @@ Demo user: `grace` (password not required — just pass `user_id=grace`).
 | POST | `/transactions` | Add a single transaction |
 | POST | `/transactions/bulk` | Add multiple transactions |
 | GET | `/transactions` | List transactions (`user_id`, `category`, `from`, `to`) |
+| GET | `/transactions/{id}` | Fetch one transaction (ownership-checked) |
+| PATCH | `/transactions/{id}` | Partially update a transaction (ownership-checked) |
+| DELETE | `/transactions/{id}` | Delete a transaction (ownership-checked) |
 | GET | `/analyze-budget` | Monthly totals, savings rate, insights |
 | POST | `/goals` | Create a savings goal |
 | GET | `/goals` | List goals for a user |
 | GET | `/goals/{id}/progress` | Goal progress with nudge string |
+| PATCH | `/goals/{id}/add-funds` | Add money to a goal |
+| DELETE | `/goals/{id}` | Delete a goal (ownership-checked) |
 | POST | `/simulate` | Project balance and goal hit date |
 | GET | `/advice` | Deterministic advisory engine |
 | GET | `/calculate-credit-score` | Proprietary 300–850 score with breakdown |
 | GET | `/generate-financial-report` | Structured JSON report |
 | GET | `/generate-financial-report/pdf` | Downloadable PDF report |
 | POST | `/coach/chat` | Intent-routed chat with optional LLM |
+| GET | `/fx/currencies` | Supported currencies and live-rate availability |
+| GET | `/fx/convert` | Convert an amount between currencies |
 
 ## Environment variables
 

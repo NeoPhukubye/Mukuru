@@ -1,8 +1,8 @@
 """PDF + JSON report generation. Pure functions for data, I/O for PDF."""
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
-from typing import Iterable
+from collections.abc import Iterable
+from datetime import datetime, timezone
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm

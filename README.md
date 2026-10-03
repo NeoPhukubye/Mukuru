@@ -152,7 +152,7 @@ cd backend
 pytest -q
 ```
 
-12 tests cover the pure service functions — categorisation across all seven categories, signed category totals, credit score range and weight invariants, and simulator projections.
+The suite covers the pure service functions (categoriser, credit engine, simulator, advisor, report generator), the API contracts (period scoping, credit-score agreement between endpoints, goal and transaction ownership isolation), and the transaction CRUD endpoints. `ruff check .` runs in CI alongside the tests.
 
 ---
 
@@ -190,16 +190,23 @@ Notes:
 | POST | `/transactions` | Add a single transaction |
 | POST | `/transactions/bulk` | Add up to 200 transactions at once |
 | GET | `/transactions` | List transactions (`user_id`, `category`, `from`, `to`) |
+| GET | `/transactions/{id}` | Fetch one transaction (ownership-checked) |
+| PATCH | `/transactions/{id}` | Partially update a transaction (ownership-checked) |
+| DELETE | `/transactions/{id}` | Delete a transaction (ownership-checked) |
 | GET | `/analyze-budget` | Category totals, savings rate, plain-language insights |
 | POST | `/goals` | Create a savings goal |
 | GET | `/goals` | List a user's goals |
 | GET | `/goals/{id}/progress` | Percent complete, remaining amount, nudge |
+| PATCH | `/goals/{id}/add-funds` | Add money to a goal |
+| DELETE | `/goals/{id}` | Delete a goal (ownership-checked) |
 | POST | `/simulate` | "What if I save R__ a week" projection |
 | GET | `/advice` | Monthly injection and pool allocation |
 | GET | `/calculate-credit-score` | Score, band, factor breakdown, history, tips |
 | GET | `/generate-financial-report` | Structured financial report (JSON) |
 | GET | `/generate-financial-report/pdf` | Downloadable formal statement |
 | POST | `/coach/chat` | Chat with the Money Coach |
+| GET | `/fx/currencies` | Supported currencies and live-rate availability |
+| GET | `/fx/convert` | Convert an amount between currencies |
 
 Full request/response schemas are available at `/docs`.
 
