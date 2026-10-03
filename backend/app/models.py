@@ -6,7 +6,8 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
-from sqlmodel import Field as SQLField, SQLModel
+from sqlmodel import Field as SQLField
+from sqlmodel import SQLModel
 
 
 class TransactionType(str, Enum):
@@ -76,6 +77,33 @@ class TransactionCreate(BaseModel):
 
 class TransactionBulkCreate(BaseModel):
     transactions: list[TransactionCreate] = Field(..., min_length=1, max_length=200)
+
+
+class TransactionUpdate(BaseModel):
+    """Partial update. Every field is optional; only what is sent is changed.
+
+    The same auto-categorisation rules apply as on create: an explicit
+    `category` is honoured, `is_remittance=True` forces the remittance bucket,
+    and `category="other"` (or omitted) triggers the rule-based matcher.
+    """
+
+    user_id: Optional[str] = Field(default=None, min_length=1, max_length=64)
+    date: Optional[date] = None
+    amount: Optional[float] = Field(default=None, gt=0)
+    merchant: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    description: Optional[str] = Field(default=None, min_length=1, max_length=256)
+    type: Optional[TransactionType] = None
+    category: Optional[Category] = None
+    is_remittance: Optional[bool] = None
+    recipient_country: Optional[str] = Field(default=None, max_length=8)
+
+    @field_validator("recipient_country")
+    @classmethod
+    def validate_country(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        v = v.strip().upper()
+        return v or None
 
 
 class TransactionListResponse(BaseModel):

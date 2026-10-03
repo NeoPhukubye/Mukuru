@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import os
 from datetime import date, timedelta
-from typing import Optional
+from typing import Any, Optional
 
-from sqlmodel import SQLModel, Session, create_engine, select
+from sqlmodel import Session, SQLModel, create_engine, select
 
-from .models import Transaction, Goal
+from .models import Goal, Transaction
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./moneycoach.db")
 
@@ -62,6 +62,44 @@ def list_transactions(
             stmt = stmt.where(Transaction.date <= to_date)
         stmt = stmt.order_by(Transaction.date)
         return list(session.exec(stmt).all())
+
+
+def get_transaction(tx_id: int, user_id: str) -> Optional[Transaction]:
+    """Return the transaction only if it belongs to user_id, else None."""
+    with Session(engine) as session:
+        tx = session.get(Transaction, tx_id)
+        if not tx or tx.user_id != user_id:
+            return None
+        return tx
+
+
+def update_transaction(
+    tx_id: int, user_id: str, fields: dict[str, Any]
+) -> Optional[Transaction]:
+    """Apply a partial update to an owned transaction. None if not found."""
+    if not fields:
+        return get_transaction(tx_id, user_id)
+    with Session(engine) as session:
+        tx = session.get(Transaction, tx_id)
+        if not tx or tx.user_id != user_id:
+            return None
+        for key, value in fields.items():
+            setattr(tx, key, value)
+        session.add(tx)
+        session.commit()
+        session.refresh(tx)
+        return tx
+
+
+def delete_transaction(tx_id: int, user_id: str) -> bool:
+    """Delete a transaction. Scoped to the owner, so one user cannot delete another's."""
+    with Session(engine) as session:
+        tx = session.get(Transaction, tx_id)
+        if not tx or tx.user_id != user_id:
+            return False
+        session.delete(tx)
+        session.commit()
+        return True
 
 
 def add_goal(goal: Goal) -> Goal:
