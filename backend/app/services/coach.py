@@ -97,6 +97,9 @@ def _focus_goals(goals: list, message: str) -> list:
 
 
 def _fallback(message: str, intent: str, ctx: dict) -> tuple[str, list[str]]:
+    from ..config import DEMO_CURRENCY_SYMBOL
+
+    symbol = DEMO_CURRENCY_SYMBOL or "R"
     budget = ctx.get("budget")
     credit = ctx.get("credit")
     goals = ctx.get("goals") or []
@@ -105,9 +108,10 @@ def _fallback(message: str, intent: str, ctx: dict) -> tuple[str, list[str]]:
     if intent == "budget" and budget:
         detail = budget.insights[1] if len(budget.insights) > 1 else ""
         reply = (
-            f"This month you've brought in R{budget.total_income:,.0f} and spent "
-            f"R{budget.total_expenses:,.0f}, leaving R{budget.surplus_deficit:,.0f} "
-            f"— a {budget.savings_rate * 100:.0f}% savings rate."
+            f"This month you've brought in {symbol}{budget.total_income:,.0f} "
+            f"and spent {symbol}{budget.total_expenses:,.0f}, leaving "
+            f"{symbol}{budget.surplus_deficit:,.0f} — a "
+            f"{budget.savings_rate * 100:.0f}% savings rate."
         )
         if detail:
             reply += " " + detail
@@ -117,17 +121,24 @@ def _fallback(message: str, intent: str, ctx: dict) -> tuple[str, list[str]]:
         lower_msg = message.lower()
         # A named asset the user does not already track: answer about *that*
         # item instead of listing unrelated goals.
-        new_asset = next((a for a in ("car", "house") if a in lower_msg and a not in
-                          {g.name.lower() for g in goals}), None)
+        new_asset = next(
+            (
+                a
+                for a in ("car", "house")
+                if a in lower_msg
+                and a not in {g.name.lower() for g in goals}
+            ),
+            None,
+        )
         if new_asset:
             income = budget.total_income if budget else 12000.0
             monthly = income * 0.15
             months = 6
             reply = (
                 f"Saving for a {new_asset} is a great milestone, Grace! With your "
-                f"R{income:,.0f} monthly income, putting aside about 15% "
-                f"(R{monthly:,.0f}/month) would build a down payment in about "
-                f"{months} months. "
+                f"{symbol}{income:,.0f} monthly income, putting aside about 15% "
+                f"({symbol}{monthly:,.0f}/month) would build a down payment in "
+                f"about {months} months. "
                 f"Would you like me to add '{new_asset.title()}' as a new savings goal?"
             )
             return reply, [
@@ -160,13 +171,18 @@ def _fallback(message: str, intent: str, ctx: dict) -> tuple[str, list[str]]:
             goal_saved=goal.saved_amount if goal else 0.0,
         )
         reply = (
-            f"Saving R{weekly:,.0f} a week for {weeks} weeks puts "
-            f"R{result['projected_total_saved']:,.0f} aside."
+            f"Saving {symbol}{weekly:,.0f} a week for {weeks} weeks puts "
+            f"{symbol}{result['projected_total_saved']:,.0f} aside."
         )
         if goal and result["goal_hit_date"]:
-            reply += f" You'd finish your {goal.name} goal around {result['goal_hit_date']}."
+            reply += (
+                f" You'd finish your {goal.name} goal around {result['goal_hit_date']}."
+            )
         elif goal:
-            reply += f" That is not enough to finish {goal.name} in that time — try a higher amount."
+            reply += (
+                f" That is not enough to finish {goal.name} in that time "
+                "— try a higher amount."
+            )
         return reply, ["Simulate R200/week", "Check my goals"]
 
     if intent == "report":
@@ -184,23 +200,27 @@ def _fallback(message: str, intent: str, ctx: dict) -> tuple[str, list[str]]:
 
 
 def _facts(ctx: dict) -> str:
+    from ..config import DEMO_CURRENCY_SYMBOL
+
+    symbol = DEMO_CURRENCY_SYMBOL or "R"
     lines: list[str] = []
     budget = ctx.get("budget")
     credit = ctx.get("credit")
 
     if budget:
         lines.append(
-            f"This month: income R{budget.total_income:,.0f}, "
-            f"expenses R{budget.total_expenses:,.0f}, "
-            f"surplus R{budget.surplus_deficit:,.0f}, "
+            f"This month: income {symbol}{budget.total_income:,.0f}, "
+            f"expenses {symbol}{budget.total_expenses:,.0f}, "
+            f"surplus {symbol}{budget.surplus_deficit:,.0f}, "
             f"savings rate {budget.savings_rate * 100:.0f}%."
         )
     if credit:
         lines.append(f"Credit score {credit.score} ({credit.band}).")
     for g in ctx.get("goals") or []:
         lines.append(
-            f"Goal {g.name}: R{g.saved_amount:,.0f} of R{g.target_amount:,.0f} "
-            f"({g.percent_complete}%), due {g.deadline}."
+            f"Goal {g.name}: {symbol}{g.saved_amount:,.0f} of "
+            f"{symbol}{g.target_amount:,.0f} ({g.percent_complete}%), "
+            f"due {g.deadline}."
         )
     return "\n".join(lines)
 

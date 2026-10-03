@@ -1,6 +1,7 @@
 """Deterministic, rule-based financial advisor."""
 from __future__ import annotations
 
+from ..config import DEMO_CURRENCY_SYMBOL
 from ..models import AdviceResponse
 
 # Rule config — tweak here to change behaviour.
@@ -32,30 +33,37 @@ def advise(
     existing_emergency: float = 0.0,
 ) -> AdviceResponse:
     """Produce a deterministic advisory from monthly cash-flow numbers."""
+    symbol = DEMO_CURRENCY_SYMBOL or "R"
     surplus = monthly_income - monthly_expenses
     rate = _savings_rate(surplus, monthly_income)
 
     if monthly_income <= 0:
         injection = 0.0
-        rationale = "We couldn't detect reliable income this month, so we recommend starting small and building up."
+        rationale = (
+            "We couldn't detect reliable income this month, so we recommend "
+            "starting small and building up."
+        )
     else:
         injection = monthly_income * RULES["base_monthly_injection_pct"]
         if rate < RULES["min_savings_rate"]:
             injection = monthly_income * 0.05
             rationale = (
-                f"Your current savings rate is {rate * 100:.0f}%, below our {RULES['min_savings_rate'] * 100:.0f}% floor. "
-                f"We recommend a modest injection of R{injection:,.0f}/month so you can build the habit without strain."
+                f"Your current savings rate is {rate * 100:.0f}%, below our "
+                f"{RULES['min_savings_rate'] * 100:.0f}% floor. We recommend a "
+                f"modest injection of {symbol}{injection:,.0f}/month so you can "
+                "build the habit without strain."
             )
         elif rate >= RULES["high_surplus_threshold"]:
             injection = monthly_income * 0.25
             rationale = (
-                f"Excellent — you're saving {rate * 100:.0f}% of income. We can push that to R{injection:,.0f}/month "
-                f"and accelerate your goals."
+                f"Excellent — you're saving {rate * 100:.0f}% of income. We can "
+                f"push that to {symbol}{injection:,.0f}/month and accelerate "
+                "your goals."
             )
         else:
             rationale = (
                 f"You're saving {rate * 100:.0f}% of income — a solid position. "
-                f"R{injection:,.0f}/month keeps momentum without stress."
+                f"{symbol}{injection:,.0f}/month keeps momentum without stress."
             )
 
     # Adjust weights if emergency fund is short.
@@ -68,7 +76,8 @@ def advise(
         weights["investment"] = 0.10
         rationale += (
             f" A {RULES['emergency_fund_months']}-month emergency fund is about "
-            f"R{emergency_target:,.0f}, so we're weighting that pool most heavily."
+            f"{symbol}{emergency_target:,.0f}, so we're weighting that pool most "
+            "heavily."
         )
 
     pools = [

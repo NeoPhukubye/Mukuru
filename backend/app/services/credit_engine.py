@@ -1,7 +1,6 @@
 """Proprietary credit score engine (300-850). Pure function."""
 from __future__ import annotations
 
-from datetime import date
 from statistics import mean, stdev
 
 from ..models import CreditFactor
@@ -98,9 +97,15 @@ def compute_credit_score(
     }
 
     details = {
-        "remittance_consistency": f"{remittance_months} of {total_months} months had a remittance",
-        "remittance_amount_stability": f"amount variance across {len(remittance_amounts)} remittances",
-        "on_time_pattern": f"{total_months - late_months} of {total_months} remittances on time",
+        "remittance_consistency": (
+            f"{remittance_months} of {total_months} months had a remittance"
+        ),
+        "remittance_amount_stability": (
+            f"amount variance across {len(remittance_amounts)} remittances"
+        ),
+        "on_time_pattern": (
+            f"{total_months - late_months} of {total_months} remittances on time"
+        ),
         "tenure": f"{tenure_months} months of history",
         "savings_behavior": f"savings rate {savings_rate * 100:.0f}%",
     }

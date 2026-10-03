@@ -11,7 +11,6 @@ from fastapi.responses import JSONResponse, RedirectResponse
 
 from . import seed as seed_module
 from .db import create_db_and_tables
-from .models import ErrorResponse
 from .routers import advice, budget, coach, credit, fx, goals, reports, simulate, transactions
 
 logger = logging.getLogger("moneycoach")

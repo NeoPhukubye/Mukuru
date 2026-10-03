@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Query
 
 from ..models import ErrorResponse, FxConversion, FxCurrencies
-from ..services.fx import SUPPORTED_CURRENCIES, FX_COVERED, convert, currency_symbol
+from ..services.fx import FX_COVERED, SUPPORTED_CURRENCIES, convert, currency_symbol
 
 router = APIRouter(prefix="/fx", tags=["fx"])
 

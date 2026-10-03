@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import date
 
 from app.models import TransactionCreate
-from app.services.categorizer import build_transaction_category, category_totals, categorize
+from app.services.categorizer import build_transaction_category, categorize, category_totals
 from app.services.credit_engine import compute_credit_score
 from app.services.simulator import simulate as _simulate
 

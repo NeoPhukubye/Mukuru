@@ -28,6 +28,9 @@ jobs:
       - name: Run tests
         run: pytest -q
 
+      - name: Lint with ruff
+        run: ruff check .
+
       - name: Smoke-test server startup
         run: |
           (uvicorn app.main:app --host 127.0.0.1 --port 8765 > /tmp/uv.log 2>&1 &) 

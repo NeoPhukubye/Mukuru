@@ -1,7 +1,7 @@
 """Coach chat endpoint."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 from sqlmodel import Session, select
 
 from ..db import engine

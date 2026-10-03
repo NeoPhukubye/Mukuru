@@ -65,7 +65,7 @@ def _build_transactions() -> list[Transaction]:
 
 
 def _build_goals() -> list[Goal]:
-    """Deadlines are relative to today so the demo never opens on an expired goal."""
+    """Deadlines are relative to today, so the demo never opens on an expired goal."""
     today = date.today()
     now = datetime.now(timezone.utc)
     return [

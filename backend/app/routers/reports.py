@@ -2,13 +2,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Query, Response
-from sqlmodel import Session, select
 
 from ..config import account_holder_for
-from ..db import engine, list_transactions_for_period, trailing_months_range
+from ..db import list_transactions_for_period, trailing_months_range
 from ..models import ErrorResponse, ReportResponse, Transaction
 from ..routers.credit import summarise_credit_inputs
-from ..services.categorizer import category_totals
 from ..services.credit_engine import compute_credit_score
 from ..services.report_generator import build_report, render_pdf
 

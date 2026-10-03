@@ -35,10 +35,13 @@ def simulate(
                     "week": weeks_elapsed,
                 }
             )
-        if goal_target is not None and goal_hit_date is None:
-            if cumulative + goal_saved >= goal_target:
-                goal_hit_date = (start + timedelta(days=7 * (m + 1))).isoformat()
-                goal_remaining = round(max(0.0, goal_target - goal_saved - cumulative), 2)
+        if (
+            goal_target is not None
+            and goal_hit_date is None
+            and cumulative + goal_saved >= goal_target
+        ):
+            goal_hit_date = (start + timedelta(days=7 * (m + 1))).isoformat()
+            goal_remaining = round(max(0.0, goal_target - goal_saved - cumulative), 2)
 
     total_saved = round(cumulative, 2)
     # Advantage over saving nothing across the same horizon.

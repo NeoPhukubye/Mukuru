@@ -5,7 +5,6 @@ from datetime import date, timedelta
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Query
-from sqlmodel import Session, select
 
 from ..db import current_month_range, list_transactions, list_transactions_for_period
 from ..models import BudgetAnalysis, ErrorResponse
@@ -26,13 +25,21 @@ _WINDOW_DAYS: dict[str, int] = {"30d": 30, "90d": 90, "180d": 180}
 def _insights(totals: dict[str, float], income: float, expenses: float, rate: float) -> list[str]:
     insights: list[str] = []
     if rate >= 0.20:
-        insights.append(f"You're saving {rate * 100:.0f}% of your income — that's excellent momentum.")
+        insights.append(
+            f"You're saving {rate * 100:.0f}% of your income — that's excellent momentum."
+        )
     elif rate >= 0.10:
-        insights.append(f"You're saving {rate * 100:.0f}% of your income. Steady and healthy.")
+        insights.append(
+            f"You're saving {rate * 100:.0f}% of your income. Steady and healthy."
+        )
     elif rate > 0:
-        insights.append(f"You're saving only {rate * 100:.0f}% of your income. Let's find some wiggle room.")
+        insights.append(
+            f"You're saving only {rate * 100:.0f}% of your income. Let's find some wiggle room."
+        )
     else:
-        insights.append("You're spending more than you earn this month. Small cuts can help turn this around.")
+        insights.append(
+            "You're spending more than you earn this month. Small cuts can help turn this around."
+        )
 
     # Only consider genuine outflows. Ranking by absolute value across signed
     # totals used to report a large salary credit as the biggest expense.
@@ -41,16 +48,26 @@ def _insights(totals: dict[str, float], income: float, expenses: float, rate: fl
         # Most negative total == largest outflow.
         top_cat, top_amount = min(outflows.items(), key=lambda kv: kv[1])
         if top_cat == "remittance":
-            insights.append("Your remittances are your biggest commitment — keeping them consistent builds trust and credit.")
+            insights.append(
+                "Your remittances are your biggest commitment — keeping them "
+                "consistent builds trust and credit."
+            )
         else:
-            insights.append(f"Your biggest outflow is {top_cat} at R{abs(top_amount):,.0f} — worth keeping an eye on.")
+            insights.append(
+                f"Your biggest outflow is {top_cat} at R{abs(top_amount):,.0f} "
+                "— worth keeping an eye on."
+            )
     else:
-        insights.append("You have no spending recorded this month — everything came in as income.")
+        insights.append(
+            "You have no spending recorded this month — everything came in as income."
+        )
 
     if expenses > income:
         insights.append("Consider setting a small weekly spending cap to stay in the green.")
     else:
-        insights.append(f"You have a R{income - expenses:,.0f} surplus — great raw material for your goals.")
+        insights.append(
+            f"You have a R{income - expenses:,.0f} surplus — great raw material for your goals."
+        )
     return insights[:3]
 
 

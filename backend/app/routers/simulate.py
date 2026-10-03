@@ -1,8 +1,8 @@
 """Simulation endpoint."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
-from sqlmodel import Session, select
+from fastapi import APIRouter, HTTPException
+from sqlmodel import Session
 
 from ..db import engine
 from ..models import ErrorResponse, Goal, SimulateRequest, SimulateResponse
